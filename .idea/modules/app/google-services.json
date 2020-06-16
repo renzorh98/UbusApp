@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "546537931736",
+    "firebase_url": "https://seclogin-1d89b.firebaseio.com",
+    "project_id": "seclogin-1d89b",
+    "storage_bucket": "seclogin-1d89b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546537931736:android:1a59315af3de1b2626a8ad",
+        "android_client_info": {
+          "package_name": "com.example.sec_login"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "546537931736-65l8igmmcnj5fqn791o0m4gqln1tut08.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sec_login",
+            "certificate_hash": "f249e3960ce55ddce406c8138d547c21b4f45eda"
+          }
+        },
+        {
+          "client_id": "546537931736-3mv5rd0jubkoejepj0kfqhf95sr67j7q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4guh5L5ojblPJ6-1urJ5l6N89sEXTRos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "546537931736-3mv5rd0jubkoejepj0kfqhf95sr67j7q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

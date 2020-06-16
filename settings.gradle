@@ -1,0 +1,3 @@
+include ':divar'
+include ':app'
+rootProject.name = "Sec_Login"
