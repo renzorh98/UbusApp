@@ -97,6 +97,7 @@ public class DatosActivity extends AppCompatActivity {
 
                     String Usuario=dataSnapshot.child("user").getValue().toString();
                     TVUsuario.setText(Usuario);
+                    
                 }else{
                     FirebaseUser user= mAuth.getCurrentUser();
                     TVUsuario.setText(user.getDisplayName());
