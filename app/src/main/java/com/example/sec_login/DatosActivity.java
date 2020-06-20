@@ -2,13 +2,21 @@ package com.example.sec_login;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +40,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class DatosActivity extends AppCompatActivity {
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.Result;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
+
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
+
+public class DatosActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     /*PARTES VISTA*/
     private Button BCerrarSesion;
     private TextView TVUsuario;
     private LoginButton BLoginFacebook;
+    private ImageView qrCode;
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
 
@@ -48,11 +66,17 @@ public class DatosActivity extends AppCompatActivity {
     private CallbackManager mCallbackManager;
     private AccessTokenTracker accessTokenTracker;
     /*FIN CONNEXION FIREBASE*/
+    /*QR Scanner*/
+    private ZXingScannerView mScannerView;
+    private Button BgenerateQR;
+    private Button BscanQR;
+
+    /*Fin QR Scanner*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_datos);
-
+        qrCode = (ImageView)findViewById(R.id.imageView);
         mAuth=FirebaseAuth.getInstance();
         mDatabase= FirebaseDatabase.getInstance().getReference();
         TVUsuario=(TextView)findViewById(R.id.Usuario);
@@ -71,6 +95,38 @@ public class DatosActivity extends AppCompatActivity {
 
             }
         });
+        BgenerateQR=(Button)findViewById(R.id.generate_QR);
+        BgenerateQR.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+
+                try {
+                    BitMatrix bitMatrix = multiFormatWriter.encode(""+(String)TVUsuario.getText(), BarcodeFormat.QR_CODE, 500, 500);
+                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+                    qrCode.getLayoutParams().height= 500;
+                    qrCode.setImageBitmap(bitmap);
+
+                } catch (WriterException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        BscanQR = (Button)findViewById(R.id.scan_QR);
+        BscanQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                mScannerView = new ZXingScannerView(DatosActivity.this);
+                setContentView(mScannerView);
+                mScannerView.setResultHandler(DatosActivity.this);
+                mScannerView.startCamera();
+            }
+        });
+
         mAuthState= new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -109,5 +165,20 @@ public class DatosActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void handleResult(Result result) {
+        Log.v("HandleResult", result.getText());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Resultado del scan");
+        builder.setMessage(result.getText());
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        //mScannerView.resumeCameraPreview(this);
+
+
     }
 }

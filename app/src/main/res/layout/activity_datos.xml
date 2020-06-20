@@ -12,14 +12,56 @@
         android:layout_height="wrap_content"
         android:text="SE MOSTRARAN DATOS"
         android:textSize="18dp"/>
+
+    <TextView
+        android:id="@+id/paypallink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+
+        android:onClick="link_PayPal"
+        android:text="Enlazar Paypal referral link"
+        tools:ignore="OnClick"
+        android:textColor="@color/com_facebook_blue"
+        android:textColorLink="@color/colorPrimary"
+        />
+    <Button
+        android:id="@+id/scan_QR"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@color/colorPrimary"
+        android:text="Escanear QR"
+        android:textColor="@android:color/white"
+        />
+
+    <Button
+        android:id="@+id/generate_QR"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@color/colorPrimary"
+        android:text="Generar QR"
+        android:textColor="@android:color/white"
+        />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:gravity="center"
+        app:srcCompat="@mipmap/ic_launcher"
+        tools:layout_editor_absoluteX="152dp"
+        tools:layout_editor_absoluteY="218dp" />
+
     <Button
         android:id="@+id/CerrarSesion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cerrar Sesion"
         android:layout_margin="20dp"
         android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"/>
+        android:text="Cerrar Sesion"
+        android:textColor="@android:color/white" />
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"

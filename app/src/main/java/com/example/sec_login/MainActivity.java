@@ -3,8 +3,12 @@ package com.example.sec_login;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -55,9 +59,12 @@ public class MainActivity extends AppCompatActivity {
     private CallbackManager mCallbackManager;
     private AccessTokenTracker accessTokenTracker;
     /*FIN CONNEXION FIREBASE*/
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+
+    private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
+        protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
+        checkPermission();
         setContentView(R.layout.activity_main);
         mAuth=FirebaseAuth.getInstance();
         FacebookSdk.sdkInitialize(getApplicationContext());
@@ -120,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
+
+
     }
 
     @Override
@@ -197,6 +206,40 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         if(mAuthState!=null){
             mAuth.removeAuthStateListener(mAuthState);
+        }
+    }
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            Toast.makeText(this, "This version is not Android 6 or later " + Build.VERSION.SDK_INT, Toast.LENGTH_LONG).show();
+
+        } else {
+            int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.CAMERA);
+            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[] {Manifest.permission.CAMERA},REQUEST_CODE_ASK_PERMISSIONS);
+
+                Toast.makeText(this, "Requiere permisos", Toast.LENGTH_LONG).show();
+
+            }else if (hasWriteContactsPermission == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, "Permiso de camara habilitado", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+        return;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(REQUEST_CODE_ASK_PERMISSIONS == requestCode) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permiso activado! " + Build.VERSION.SDK_INT, Toast.LENGTH_LONG).show();
+
+            } else {
+                Toast.makeText(this, "No cuenta con permisos! " + Build.VERSION.SDK_INT, Toast.LENGTH_LONG).show();
+            }
+        }else{
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }
