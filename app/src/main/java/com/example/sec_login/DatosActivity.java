@@ -77,8 +77,8 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_datos);
-        qrCode = (ImageView)findViewById(R.id.imageView);
-        mAuth =FirebaseAuth.getInstance();
+        qrCode=(ImageView)findViewById(R.id.imageView);
+        mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         TVUsuario=(TextView)findViewById(R.id.Usuario);
         BLoginFacebook=findViewById(R.id.login_button);
