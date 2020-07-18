@@ -43,18 +43,65 @@ tools:context=".RegistroActivity">
         android:orientation="vertical">
 
         <Switch
-            android:id="@+id/switch2"
+            android:id="@+id/swProveedor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Proveedor de Servicio" />
 
-        <EditText
-            android:id="@+id/editTextTextPersonName"
+        <LinearLayout
+            android:id="@+id/llProveedores"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Compañia"
-            android:inputType="textPersonName" />
+            android:layout_height="285dp"
+            android:gravity="top"
+            android:orientation="vertical">
+
+            <Switch
+                android:id="@+id/swCompania"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Compañia - Transportista" />
+
+            <EditText
+                android:id="@+id/CompaniaL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Compañia"
+                android:inputType="textPersonName" />
+
+            <Spinner
+                android:id="@+id/SpCompania"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="false"
+                android:dropDownWidth="match_parent"
+                android:isScrollContainer="false"
+                android:spinnerMode="dropdown" />
+
+            <EditText
+                android:id="@+id/ContactoL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Num. de Contacto"
+                android:inputType="phone" />
+
+            <EditText
+                android:id="@+id/PlacaL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Placa (V0I345)"
+                android:inputType="textPersonName"/>
+
+            <EditText
+                android:id="@+id/CodRegistroL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:hint="Codigo de Registro" />
+        </LinearLayout>
     </LinearLayout>
 
     <Button

@@ -154,7 +154,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
 
                     String Usuario=dataSnapshot.child("user").getValue().toString();
                     TVUsuario.setText(Usuario);
-                    
+
                 }else{
                     FirebaseUser user= mAuth.getCurrentUser();
                     TVUsuario.setText(user.getDisplayName());
