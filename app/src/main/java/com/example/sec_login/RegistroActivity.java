@@ -54,6 +54,7 @@ public class RegistroActivity extends AppCompatActivity {
     private String NumContacto;
     private String Compania;
     private String Placa;
+    private String Codigo;
     private boolean ES_Compania;
     private boolean ES_Proveedor;
     /*FIN VARIABLES*/
@@ -168,14 +169,23 @@ public class RegistroActivity extends AppCompatActivity {
                 NumContacto= ETContactoL.getText().toString().trim();
                 Compania= ETCompaniaL.getText().toString().trim();
                 Placa= ETPlacaL.getText().toString().trim();
-
+                Codigo= ETCodigoRegistroL.getText().toString().trim();
                 if ((   (!ES_Proveedor && !Usuario.isEmpty()) ||
-                        (ES_Proveedor && ES_Compania && !Compania.isEmpty() && !NumContacto.isEmpty() && Comprobar_Companias(Compania)) ||
-                        (ES_Proveedor && !ES_Compania && !Placa.isEmpty() && SPCompanias.getSelectedItem().toString()!="Seleccione" && Comprobar_Placas(Placa))
+                        (ES_Proveedor && ES_Compania && !Compania.isEmpty() && !NumContacto.isEmpty() ) ||
+                        (ES_Proveedor && !ES_Compania && !Placa.isEmpty() && SPCompanias.getSelectedItem().toString()!="Seleccione" )
                     )
                     && !Email.isEmpty() && !Password.isEmpty()) {
                     if (Password.length() >= 6) {
-                        registrarUsuario();
+                        if(!ES_Proveedor) {
+                            registrarUsuario();
+                        }else if(ES_Proveedor && ES_Compania){
+                            if(NumContacto.length()==9)
+                                Previo_Para_Companias();
+                            else
+                                Toast.makeText(RegistroActivity.this, "El Numero de Contacto debe contener 9 digitos.", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Previo_Para_Placas();
+                        }
                     } else {
                         Toast.makeText(RegistroActivity.this, "El password debe tener al menos 6 caracteres.", Toast.LENGTH_SHORT).show();
                     }
@@ -185,21 +195,26 @@ public class RegistroActivity extends AppCompatActivity {
             }
         });
     }
-    private boolean Comprobar_Companias(final String User){
+    private void Previo_Para_Companias(){
         Query mData = mDatabase.child("Users");
-        final boolean[] retorno = {true};
         mData.addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot){
+                boolean bandera=false;
                 for(DataSnapshot data: dataSnapshot.getChildren()){
                     try {
                         int tipo = data.child("tipo").getValue(Integer.class);
                         String user=data.child("user").getValue(String.class);
-                        if (tipo == 1 && user.toUpperCase()==User.toUpperCase()) {
-                            retorno[0] =false;
+                        if (tipo == 1 && user.equalsIgnoreCase(Compania)) {
+                            bandera=true;
                             break;
                         }
                     }catch (Exception e){continue;}
+                }
+                if(!bandera){
+                    registrarUsuario();
+                }else{
+                    Toast.makeText(RegistroActivity.this, "Ya existe esta Compañia.", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -208,23 +223,64 @@ public class RegistroActivity extends AppCompatActivity {
 
             }
         });
-        return retorno[0];
     }
-    private boolean Comprobar_Placas(final String User){
+    private void Previo_Para_Placas(){
         Query mData = mDatabase.child("Users");
-        final boolean[] retorno = {true};
-        mData.addValueEventListener(new ValueEventListener(){
+        mData.addListenerForSingleValueEvent(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot){
+                boolean bandera=false;
                 for(DataSnapshot data: dataSnapshot.getChildren()){
                     try {
                         int tipo = data.child("tipo").getValue(Integer.class);
                         String user=data.child("user").getValue(String.class);
-                        if (tipo == 2 && user.toUpperCase()==User.toUpperCase()) {
-                            retorno[0] =false;
+                        if (tipo == 2 && user.equalsIgnoreCase(Placa.toUpperCase())) {
                             break;
                         }
                     }catch (Exception e){continue;}
+                }
+                if(!bandera){
+                    Query mData = mDatabase.child("Users");
+                    mData.addListenerForSingleValueEvent(new ValueEventListener(){
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot){
+                            boolean bandera=false;
+                            for(DataSnapshot data: dataSnapshot.getChildren()){
+                                try {
+                                    int tipo = data.child("tipo").getValue(Integer.class);
+                                    String user=data.child("user").getValue(String.class);
+                                    if (tipo == 1 && user.equalsIgnoreCase(SPCompanias.getSelectedItem().toString())) {
+                                        String userGuid = data.getKey();
+                                        String uso = data.child("Codigos").child(Codigo).child("Uso").getValue(String.class);
+                                        if (uso.equalsIgnoreCase("0")) {
+                                            Map<String, Object> map = new HashMap<>();
+                                            map.put("Uso", "1");
+                                            mDatabase.child("Users").child(userGuid).child("Codigos").child(Codigo).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task2) {
+                                                    registrarUsuario();
+                                                }
+                                            });
+                                            bandera=true;
+                                            break;
+                                        }
+                                    }
+                                }catch (Exception e){
+                                    continue;
+                                }
+                            }
+                            if(!bandera) {
+                                Toast.makeText(RegistroActivity.this, "Codigo Invalido.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }else{
+                    Toast.makeText(RegistroActivity.this, "Esta Placa ya esta Registrada.", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -233,7 +289,6 @@ public class RegistroActivity extends AppCompatActivity {
 
             }
         });
-        return retorno[0];
     }
     private void registrarUsuario() {
         mAuth.createUserWithEmailAndPassword(Email, Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -252,6 +307,7 @@ public class RegistroActivity extends AppCompatActivity {
                     if(ES_Proveedor && ES_Compania) {
                         map.put("user", Compania);
                         map.put("tipo", 1);
+                        map.put("NumContacto", NumContacto);
                     }
                     map.put("email", Email);
                     map.put("password", Password);

@@ -48,17 +48,23 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class DatosActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
     /*PARTES VISTA*/
     private Button BCerrarSesion;
+    private Button BGenerarCodigo;
     private TextView TVUsuario;
+    private TextView TVCodigo;
     private LoginButton BLoginFacebook;
     private ImageView qrCode;
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
-
+    private String ID;
     /*FIN VARIABLES*/
     /*CONNEXION FIREBASE*/
     FirebaseAuth mAuth;
@@ -84,7 +90,6 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         BLoginFacebook=findViewById(R.id.login_button);
         BLoginFacebook.setReadPermissions("email","public_profile");
         BLoginFacebook.setVisibility(View.INVISIBLE);
-        getDatos();
         BCerrarSesion=(Button)findViewById(R.id.CerrarSesion);
         BCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +118,27 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                 } catch (WriterException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+        TVCodigo=findViewById(R.id.MostrarCodigo);
+        BGenerarCodigo=findViewById(R.id.GenCodTransportistas);
+        BGenerarCodigo.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                final String codigo = UUID.randomUUID().toString();
+                Map<String, Object> map = new HashMap<>();
+                map.put("Uso", "0");
+                mDatabase.child("Users").child(ID).child("Codigos").child(codigo).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task2) {
+                        if (task2.isSuccessful()) {
+                            Toast.makeText(DatosActivity.this, "Generación Exitosa", Toast.LENGTH_SHORT).show();
+                            TVCodigo.setText(codigo);
+                        } else {
+                            Toast.makeText(DatosActivity.this, "Error al momento de Generar Codigo.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         });
 
@@ -144,20 +170,45 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                 }
             }
         };
+        getDatos();
     }
     private void getDatos(){
-        final String ID=mAuth.getCurrentUser().getUid();
+        BscanQR.setVisibility(View.INVISIBLE);
+        BgenerateQR.setVisibility(View.INVISIBLE);
+        BGenerarCodigo.setVisibility(View.INVISIBLE);
+        ID=mAuth.getCurrentUser().getUid();
         mDatabase.child("Users").child(ID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists() && dataSnapshot.child("user").exists()){
-
-                    String Usuario=dataSnapshot.child("user").getValue().toString();
-                    TVUsuario.setText(Usuario);
-
+                    try {
+                        int tipo = dataSnapshot.child("tipo").getValue(Integer.class);
+                        String Usuario = dataSnapshot.child("user").getValue().toString();
+                        TVUsuario.setText(Usuario);
+                        if (tipo == 1) {
+                            BscanQR.setVisibility(View.INVISIBLE);
+                            BgenerateQR.setVisibility(View.INVISIBLE);
+                            BGenerarCodigo.setVisibility(View.VISIBLE);
+                        } else if (tipo == 2) {
+                            BscanQR.setVisibility(View.VISIBLE);
+                            BgenerateQR.setVisibility(View.INVISIBLE);
+                            BGenerarCodigo.setVisibility(View.INVISIBLE);
+                        } else {
+                            BscanQR.setVisibility(View.INVISIBLE);
+                            BgenerateQR.setVisibility(View.VISIBLE);
+                            BGenerarCodigo.setVisibility(View.INVISIBLE);
+                        }
+                    }catch (Exception e){
+                        BscanQR.setVisibility(View.INVISIBLE);
+                        BgenerateQR.setVisibility(View.VISIBLE);
+                        BGenerarCodigo.setVisibility(View.INVISIBLE);
+                    }
                 }else{
                     FirebaseUser user= mAuth.getCurrentUser();
                     TVUsuario.setText(user.getDisplayName());
+                    BscanQR.setVisibility(View.INVISIBLE);
+                    BgenerateQR.setVisibility(View.VISIBLE);
+                    BGenerarCodigo.setVisibility(View.INVISIBLE);
                 }
             }
 

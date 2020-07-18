@@ -55,6 +55,21 @@
         tools:layout_editor_absoluteY="218dp" />
 
     <Button
+        android:id="@+id/GenCodTransportistas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@color/colorPrimary"
+        android:text="Generar Codigo"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/MostrarCodigo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+    <Button
         android:id="@+id/CerrarSesion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,4 +85,5 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp" />
+
 </LinearLayout>
