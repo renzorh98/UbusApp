@@ -58,6 +58,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
     /*PARTES VISTA*/
     private Button BCerrarSesion;
     private Button BGenerarCodigo;
+    private Button BAbrirOperaciones;
     private TextView TVUsuario;
     private TextView TVCodigo;
     private LoginButton BLoginFacebook;
@@ -87,6 +88,13 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         TVUsuario=(TextView)findViewById(R.id.Usuario);
+        BAbrirOperaciones=findViewById(R.id.AbrirOperaciones);
+        BAbrirOperaciones.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DatosActivity.this,OperacionesActivity.class));
+            }
+        });
         BLoginFacebook=findViewById(R.id.login_button);
         BLoginFacebook.setReadPermissions("email","public_profile");
         BLoginFacebook.setVisibility(View.INVISIBLE);

@@ -234,9 +234,7 @@ public class RegistroActivity extends AppCompatActivity {
                     try {
                         int tipo = data.child("tipo").getValue(Integer.class);
                         String user=data.child("user").getValue(String.class);
-                        if (tipo == 2 && user.equalsIgnoreCase(Placa.toUpperCase())) {
-                            break;
-                        }
+                        if (tipo == 2 && user.equalsIgnoreCase(Placa.toUpperCase())) {break;}
                     }catch (Exception e){continue;}
                 }
                 if(!bandera){
@@ -265,29 +263,18 @@ public class RegistroActivity extends AppCompatActivity {
                                             break;
                                         }
                                     }
-                                }catch (Exception e){
-                                    continue;
-                                }
+                                }catch (Exception e){continue;}
                             }
-                            if(!bandera) {
-                                Toast.makeText(RegistroActivity.this, "Codigo Invalido.", Toast.LENGTH_SHORT).show();
-                            }
+                            if(!bandera) Toast.makeText(RegistroActivity.this, "Codigo Invalido.", Toast.LENGTH_SHORT).show();
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
-
                         }
                     });
-                }else{
-                    Toast.makeText(RegistroActivity.this, "Esta Placa ya esta Registrada.", Toast.LENGTH_SHORT).show();
-                }
+                }else{Toast.makeText(RegistroActivity.this, "Esta Placa ya esta Registrada.", Toast.LENGTH_SHORT).show();}
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError databaseError) {}
         });
     }
     private void registrarUsuario() {

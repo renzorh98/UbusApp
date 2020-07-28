@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".OperacionesActivity">
+
+    <Button
+        android:id="@+id/ActivarGPS"
+        android:layout_width="197dp"
+        android:layout_height="49dp"
+        android:text="Activar GPS"
+        tools:layout_editor_absoluteX="36dp"
+        tools:layout_editor_absoluteY="33dp" />
+
+    <Button
+        android:id="@+id/SeleccionRuta"
+        android:layout_width="199dp"
+        android:layout_height="63dp"
+        android:text="Selección de Ruta"
+        tools:layout_editor_absoluteX="36dp"
+        tools:layout_editor_absoluteY="112dp"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/VerMapa"
+        android:layout_width="196dp"
+        android:layout_height="54dp"
+        android:text="Ver Mapa"
+        tools:layout_editor_absoluteX="39dp"
+        tools:layout_editor_absoluteY="197dp" />
+
+    <Button
+        android:id="@+id/VerRuta"
+        android:layout_width="199dp"
+        android:layout_height="58dp"
+        android:text="Ver Ruta"
+        tools:layout_editor_absoluteX="34dp"
+        tools:layout_editor_absoluteY="265dp" />
+</LinearLayout>
