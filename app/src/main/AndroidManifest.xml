@@ -4,6 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +15,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".OperacionesActivity"></activity>
+        <activity android:name=".ListadoActivity"></activity>
+        <activity android:name=".OperacionesActivity" />
         <activity android:name=".RegistroActivity" />
         <activity android:name=".DatosActivity" />
         <activity android:name=".MainActivity">

@@ -25,14 +25,6 @@
         tools:ignore="MissingConstraints" />
 
     <Button
-        android:id="@+id/VerMapa"
-        android:layout_width="196dp"
-        android:layout_height="54dp"
-        android:text="Ver Mapa"
-        tools:layout_editor_absoluteX="39dp"
-        tools:layout_editor_absoluteY="197dp" />
-
-    <Button
         android:id="@+id/VerRuta"
         android:layout_width="199dp"
         android:layout_height="58dp"

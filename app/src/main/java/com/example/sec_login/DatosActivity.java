@@ -66,6 +66,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
     private String ID;
+    private int tipoUsuario;
     /*FIN VARIABLES*/
     /*CONNEXION FIREBASE*/
     FirebaseAuth mAuth;
@@ -92,7 +93,10 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         BAbrirOperaciones.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DatosActivity.this,OperacionesActivity.class));
+                Intent intent = new Intent(DatosActivity.this, OperacionesActivity.class);
+                intent.putExtra("tipoUsuario", tipoUsuario);
+                startActivity(intent);
+                //startActivity(new Intent(DatosActivity.this,OperacionesActivity.class));
             }
         });
         BLoginFacebook=findViewById(R.id.login_button);
@@ -191,6 +195,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                 if(dataSnapshot.exists() && dataSnapshot.child("user").exists()){
                     try {
                         int tipo = dataSnapshot.child("tipo").getValue(Integer.class);
+                        tipoUsuario=tipo;
                         String Usuario = dataSnapshot.child("user").getValue().toString();
                         TVUsuario.setText(Usuario);
                         if (tipo == 1) {
