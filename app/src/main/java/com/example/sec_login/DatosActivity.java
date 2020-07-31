@@ -80,6 +80,8 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
     private Button BgenerateQR;
     private Button BscanQR;
 
+    private String bdemail;
+    private String bdtipo;
     /*Fin QR Scanner*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,9 +121,11 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
             @Override
             public void onClick(View v) {
                 MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+                String textcode = "user: "+(String)TVUsuario.getText()+"\nemail: "+bdemail+"\ntipo: "+bdtipo;
+
 
                 try {
-                    BitMatrix bitMatrix = multiFormatWriter.encode(""+(String)TVUsuario.getText(), BarcodeFormat.QR_CODE, 500, 500);
+                    BitMatrix bitMatrix = multiFormatWriter.encode(""+textcode, BarcodeFormat.QR_CODE, 500, 500);
                     BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
                     Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
                     qrCode.getLayoutParams().height= 500;
@@ -198,19 +202,26 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                         tipoUsuario=tipo;
                         String Usuario = dataSnapshot.child("user").getValue().toString();
                         TVUsuario.setText(Usuario);
+                        bdemail=dataSnapshot.child("email").getValue().toString();
+                        bdtipo=dataSnapshot.child("tipo").getValue().toString();
+
                         if (tipo == 1) {
+                            bdtipo="Compania";
                             BscanQR.setVisibility(View.INVISIBLE);
                             BgenerateQR.setVisibility(View.INVISIBLE);
                             BGenerarCodigo.setVisibility(View.VISIBLE);
                         } else if (tipo == 2) {
+                            bdtipo="Transportista";
                             BscanQR.setVisibility(View.INVISIBLE);
                             BgenerateQR.setVisibility(View.VISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         } else {
+                            bdtipo="Ciudadano";
                             BscanQR.setVisibility(View.VISIBLE);
                             BgenerateQR.setVisibility(View.INVISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         }
+
                     }catch (Exception e){
                         BscanQR.setVisibility(View.INVISIBLE);
                         BgenerateQR.setVisibility(View.VISIBLE);
