@@ -203,12 +203,12 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                             BgenerateQR.setVisibility(View.INVISIBLE);
                             BGenerarCodigo.setVisibility(View.VISIBLE);
                         } else if (tipo == 2) {
-                            BscanQR.setVisibility(View.VISIBLE);
-                            BgenerateQR.setVisibility(View.INVISIBLE);
-                            BGenerarCodigo.setVisibility(View.INVISIBLE);
-                        } else {
                             BscanQR.setVisibility(View.INVISIBLE);
                             BgenerateQR.setVisibility(View.VISIBLE);
+                            BGenerarCodigo.setVisibility(View.INVISIBLE);
+                        } else {
+                            BscanQR.setVisibility(View.VISIBLE);
+                            BgenerateQR.setVisibility(View.INVISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         }
                     }catch (Exception e){

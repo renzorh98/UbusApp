@@ -52,5 +52,15 @@ public class OperacionesActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        BVerRuta=findViewById(R.id.VerRuta);
+        BVerRuta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OperacionesActivity.this, rutaInterfaz.class);
+                startActivity(intent);
+            }
+        });
+
     }
 }

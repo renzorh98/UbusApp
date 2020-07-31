@@ -223,6 +223,14 @@ public class MainActivity extends AppCompatActivity {
             }else if (hasWriteContactsPermission == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this, "Permiso de camara habilitado", Toast.LENGTH_LONG).show();
             }
+            int permissionCheck = checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION);
+            if(permissionCheck != PackageManager.PERMISSION_GRANTED){
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_ASK_PERMISSIONS);
+
+                Toast.makeText(this, "Requiere permisos", Toast.LENGTH_LONG).show();
+            }else if(permissionCheck == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, "Permiso de localizacion habilitado", Toast.LENGTH_LONG).show();
+            }
 
         }
 

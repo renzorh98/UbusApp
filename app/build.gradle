@@ -28,6 +28,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'com.google.firebase:firebase-database:19.3.0'
     implementation 'com.google.firebase:firebase-auth:19.3.1'
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
@@ -35,5 +36,5 @@ dependencies {
     implementation 'me.dm7.barcodescanner:zxing:1.8.4'
     implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
-
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
 }
