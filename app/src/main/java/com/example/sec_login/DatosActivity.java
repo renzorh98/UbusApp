@@ -46,6 +46,8 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.Result;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.util.HashMap;
@@ -162,11 +164,12 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         BscanQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent();
-                mScannerView = new ZXingScannerView(DatosActivity.this);
-                setContentView(mScannerView);
-                mScannerView.setResultHandler(DatosActivity.this);
-                mScannerView.startCamera();
+                scanCode();
+//                Intent intent = new Intent();
+//                mScannerView = new ZXingScannerView(DatosActivity.this);
+//                setContentView(mScannerView);
+//                mScannerView.setResultHandler(DatosActivity.this);
+//                mScannerView.startCamera();
             }
         });
 
@@ -188,6 +191,52 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         };
         getDatos();
     }
+
+    private void scanCode() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setCaptureActivity(CaptureAct.class);
+        integrator.setOrientationLocked(false);
+        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES);
+        integrator.setPrompt("Scanning Code");
+        integrator.initiateScan();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+        if(result != null){
+            if(result.getContents() != null){
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(result.getContents());
+                builder.setTitle("Scanning Result");
+                builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Realizar pago
+                        scanCode();
+
+                    }
+                }).setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                }).setNegativeButton("Pay", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.e("Pago", "Realizar pago Paypal");
+                    }
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            }else{
+                Toast.makeText(this, "Scan Error", Toast.LENGTH_LONG).show();
+            }
+        }else{
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     private void getDatos(){
         BscanQR.setVisibility(View.INVISIBLE);
         BgenerateQR.setVisibility(View.INVISIBLE);
