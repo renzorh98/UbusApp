@@ -62,8 +62,10 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Polyline> tmpPolyline = new ArrayList<Polyline>();
     private ArrayList<Polyline> Polynes = new ArrayList<Polyline>();
 
+
     @Override
     protected void onDestroy() {
+        finish();
         super.onDestroy();
     }
 
@@ -107,7 +109,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                 if(location != null){
                     Latitude = location.getLatitude();
                     Longitude = location.getLongitude();
-                    Log.e("",Latitude+","+Longitude);
+                    //Log.e("",Latitude+","+Longitude);
 
                     if (ActivityCompat.checkSelfPermission(rutaInterfaz.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(rutaInterfaz.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
@@ -124,7 +126,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
        GRAFICA TODAS LAS UNIDADES DE TRANSPORTE QUE SE TIENEN EN EL FIREBASE
          */
 
-        markerMap(mMap);
+
 
         //EN UN FOR SE DEBERIA REALIZAR LA INVOCACION DE ESTE METODO EJM
         /*
@@ -142,7 +144,9 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
         //polyLineMap(mMap, "Cerro_Colorado_SAC", "RUTA_E_06A", "Vuelta");
         polyLineMap(mMap, "El_Rapido_de_Selva_Alegre", "RUTA_S_011", "Ida");
         polyLineMap(mMap, "El_Rapido_de_Selva_Alegre", "RUTA_S_011", "Vuelta");
-        countDownTimer();
+
+        markerMap(mMap);
+        //Log.e("Msng", "termine");
 
 
     }
@@ -160,13 +164,13 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                     mDatabase.child("Users").child(snapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                            Log.e("asdasd",""+dataSnapshot2.child("tipo").getValue(Integer.class));
+                            //Log.e("asdasd",""+dataSnapshot2.child("tipo").getValue(Integer.class));
                             if(2 == dataSnapshot2.child("tipo").getValue(Integer.class)){
 
                                 BusPosition bp = dataSnapshot2.child("Ubicacion").getValue(BusPosition.class);
                                 Double lat = bp.getLatitud();
                                 Double lon = bp.getLongitud();
-                                Log.e("LATLONG",""+lat+","+lon);
+                                //Log.e("LATLONG",""+lat+","+lon);
                                 MarkerOptions markeroptions = new MarkerOptions();
                                 markeroptions.position(new LatLng(lat,lon)).title(
                                         ""+dataSnapshot2.child("email").getValue()).snippet(
@@ -192,10 +196,12 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+        countDownTimer();
+
 
     }
     private void countDownTimer(){
-        new CountDownTimer(5000, 1000) {
+        new CountDownTimer(10000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 Log.e("seconds remaining: ", ""+millisUntilFinished/1000);
