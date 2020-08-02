@@ -2,8 +2,12 @@ package com.example.sec_login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Parcelable;
@@ -13,6 +17,8 @@ import android.widget.Toast;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -22,6 +28,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,6 +45,7 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     public double Longitude;
     private FusedLocationProviderClient mFusedLocationClient;
     LatLng uPos;
+    String str="";
 
     /*CONNEXION FIREBASE*/
     FirebaseAuth mAuth;
@@ -47,7 +55,7 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     private AccessTokenTracker accessTokenTracker;
     /*FIN CONNEXION FIREBASE*/
 
-    private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
+    private List<Seleccion> ListaCompanyas;
     private ArrayList<Marker> tmpMarker = new ArrayList<Marker>();
     private ArrayList<Marker> Markers = new ArrayList<Marker>();
 
@@ -62,21 +70,46 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         Bundle bundle = getIntent().getExtras();
-        ArrayList<Seleccion> ListaCompanyas = bundle.getParcelableArrayList("ListaSeleccion");
-        String str="";
-        for (Seleccion s:ListaCompanyas) {
-            str+=s.ID+" "+s.Companya+" "+(s.Vuelta?"Vuelta":"Ida")+"\n";
-        }
-        Toast.makeText(BusesCercanos.this, str, Toast.LENGTH_SHORT).show();
+        ListaCompanyas = bundle.getParcelableArrayList("ListaSeleccion");
+
+
+        //Toast.makeText(BusesCercanos.this, str, Toast.LENGTH_SHORT).show();
         //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
         //        .findFragmentById(R.id.map);
         //mapFragment.getMapAsync(this);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        polyLineMap(mMap, "DICA", "Ida");
-        polyLineMap(mMap, "DICC", "Vuelta");
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location != null){
+                    Latitude = location.getLatitude();
+                    Longitude = location.getLongitude();
+                    //Log.e("",Latitude+","+Longitude);
+
+                    if (ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    mMap.setMyLocationEnabled(true);
+                    uPos = new LatLng(Latitude, Longitude);
+                    //mMap.addMarker(new MarkerOptions().position(uPos).title("Posicion Actual"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
+                }
+            }
+        });
+        for (Seleccion s:ListaCompanyas) {
+            polyLineMap(mMap,s.Companya,(s.Vuelta?"Vuelta":"Ida"));
+            //str+=s.ID+" "+s.Companya+" "+(s.Vuelta?"Vuelta":"Ida");
+        }
 
         markerMap(mMap);
     }
