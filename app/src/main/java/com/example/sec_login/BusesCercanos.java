@@ -41,6 +41,7 @@ import java.util.List;
 
 public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
+    boolean control = false;
     public double Latitude;
     public double Longitude;
     private FusedLocationProviderClient mFusedLocationClient;
@@ -61,6 +62,35 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
 
     private ArrayList<Polyline> tmpPolyline = new ArrayList<Polyline>();
     private ArrayList<Polyline> Polynes = new ArrayList<Polyline>();
+
+    CountDownTimer Count;
+    @Override
+    public void onBackPressed() {
+        Count.cancel();
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onResume() {
+        if(control == true) {
+            countDownTimer();
+            control = false;
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        control = true;
+        Count.cancel();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Count.cancel();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +114,7 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        /*mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -105,7 +135,12 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
                 }
             }
-        });
+        });*/
+        //COMENTAR
+        uPos = new LatLng(-16.37298,-71.508553);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
+        //COMENTAR
+
         for (Seleccion s:ListaCompanyas) {
             polyLineMap(mMap,s.Companya,(s.Vuelta?"Vuelta":"Ida"));
             //str+=s.ID+" "+s.Companya+" "+(s.Vuelta?"Vuelta":"Ida");
@@ -153,7 +188,7 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
         countDownTimer();
     }
     private void countDownTimer(){
-        new CountDownTimer(10000, 1000) {
+        Count = new CountDownTimer(10000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 Log.e("seconds remaining: ", ""+millisUntilFinished/1000);
