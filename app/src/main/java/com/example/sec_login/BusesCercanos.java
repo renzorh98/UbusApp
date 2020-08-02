@@ -32,7 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BusesCercanos extends AppCompatActivity implements OnMapReadyCallback {
+public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     public double Latitude;
     public double Longitude;
@@ -57,6 +57,7 @@ public class BusesCercanos extends AppCompatActivity implements OnMapReadyCallba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_buses_cercanos);
 
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -74,8 +75,8 @@ public class BusesCercanos extends AppCompatActivity implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        polyLineMap(mMap, "El_Rapido_de_Selva_Alegre", "RUTA_S_011", "Ida");
-        polyLineMap(mMap, "El_Rapido_de_Selva_Alegre", "RUTA_S_011", "Vuelta");
+        polyLineMap(mMap, "DICA", "Ida");
+        polyLineMap(mMap, "DICC", "Vuelta");
 
         markerMap(mMap);
     }
@@ -131,9 +132,8 @@ public class BusesCercanos extends AppCompatActivity implements OnMapReadyCallba
             }
         }.start();
     }
-
-    private void polyLineMap(final GoogleMap gMap, String compania, String ruta, final String ida_vuelta){
-        mDatabase.child("Ruta").child(compania).child(ruta).child(ida_vuelta).addListenerForSingleValueEvent(new ValueEventListener() {
+    private void polyLineMap(final GoogleMap gMap, String ruta, final String ida_vuelta){
+        mDatabase.child("Ruta").child(ruta).child(ida_vuelta).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<BusPosition> Ruta = new ArrayList<>();
@@ -159,6 +159,7 @@ public class BusesCercanos extends AppCompatActivity implements OnMapReadyCallba
             }
         });
     }
+
     private ArrayList<BusPosition> StringToArray(String Sruta){
         String str[] = Sruta.split(";");
         ArrayList<BusPosition> ret = new ArrayList<>();
