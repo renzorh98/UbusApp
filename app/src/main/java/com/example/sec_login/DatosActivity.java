@@ -261,13 +261,13 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                             BGenerarCodigo.setVisibility(View.VISIBLE);
                         } else if (tipo == 2) {
                             bdtipo="Transportista";
-                            BscanQR.setVisibility(View.INVISIBLE);
-                            BgenerateQR.setVisibility(View.VISIBLE);
+                            BscanQR.setVisibility(View.VISIBLE);
+                            BgenerateQR.setVisibility(View.INVISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         } else {
                             bdtipo="Ciudadano";
-                            BscanQR.setVisibility(View.VISIBLE);
-                            BgenerateQR.setVisibility(View.INVISIBLE);
+                            BscanQR.setVisibility(View.INVISIBLE);
+                            BgenerateQR.setVisibility(View.VISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         }
 

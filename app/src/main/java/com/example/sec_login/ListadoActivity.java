@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class ListadoActivity extends AppCompatActivity {
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
     private int contadorChecks=0;
-    private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
+    private ArrayList<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
     /*FIN VARIABLES*/
     /*CONNEXION FIREBASE*/
     DatabaseReference mDatabase;
@@ -53,14 +55,16 @@ public class ListadoActivity extends AppCompatActivity {
         BBuscarCercanos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String str="";
-                for (Seleccion s:ListaCompanyas) {
-                    str+=s.ID+" "+s.Companya+" "+(s.Vuelta?"Vuelta":"Ida")+"\n";
-                }
-                Toast.makeText(ListadoActivity.this, str, Toast.LENGTH_SHORT).show();
                 /*AQUI CREA A QUE ACTIVITY TE REDIRECCIONARA PARA EL MAPA*/
-
-
+                try {
+                    Intent intent = new Intent(ListadoActivity.this, BusesCercanos.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList("ListaSeleccion",ListaCompanyas);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }catch (Exception e){
+                    Toast.makeText(ListadoActivity.this, e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                }
 
 
 
@@ -86,7 +90,7 @@ public class ListadoActivity extends AppCompatActivity {
                             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                    if(contadorChecks<2) {
+                                    if(contadorChecks<3) {
                                         String companya=buttonView.getText().toString();
                                         if (isChecked){
                                             contadorChecks++;
@@ -127,10 +131,10 @@ public class ListadoActivity extends AppCompatActivity {
                                             TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
                                             row.removeViewAt(1);
                                         }
-                                    }else if(contadorChecks==2 && isChecked){
+                                    }else if(contadorChecks==3 && isChecked){
                                         Toast.makeText(ListadoActivity.this,"Maximo 3 compañias.", Toast.LENGTH_SHORT).show();
                                     }
-                                    else if(contadorChecks==2 && !isChecked){
+                                    else if(contadorChecks==3 && !isChecked){
                                         contadorChecks--;
                                         String companya=buttonView.getText().toString();
                                         for(int i=0;i<ListaCompanyas.size();i++){

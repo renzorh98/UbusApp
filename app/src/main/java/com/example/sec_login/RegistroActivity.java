@@ -57,6 +57,7 @@ public class RegistroActivity extends AppCompatActivity {
     private String Codigo;
     private boolean ES_Compania;
     private boolean ES_Proveedor;
+    private String UsuarioCompanya;
     /*FIN VARIABLES*/
     /*CONNEXION FIREBASE*/
     FirebaseAuth mAuth;
@@ -251,14 +252,8 @@ public class RegistroActivity extends AppCompatActivity {
                                         String userGuid = data.getKey();
                                         String uso = data.child("Codigos").child(Codigo).child("Uso").getValue(String.class);
                                         if (uso.equalsIgnoreCase("0")) {
-                                            Map<String, Object> map = new HashMap<>();
-                                            map.put("Uso", "1");
-                                            mDatabase.child("Users").child(userGuid).child("Codigos").child(Codigo).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task2) {
-                                                    registrarUsuario();
-                                                }
-                                            });
+                                            UsuarioCompanya=userGuid;
+                                            registrarUsuario();
                                             bandera=true;
                                             break;
                                         }
@@ -290,6 +285,7 @@ public class RegistroActivity extends AppCompatActivity {
                     if(ES_Proveedor && !ES_Compania) {
                         map.put("user", Placa);
                         map.put("tipo", 2);
+                        map.put("Companya",SPCompanias.getSelectedItem().toString());
                     }
                     if(ES_Proveedor && ES_Compania) {
                         map.put("user", Compania);
@@ -316,7 +312,15 @@ public class RegistroActivity extends AppCompatActivity {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task2) {
                                                     if (task2.isSuccessful()) {
-                                                        Toast.makeText(RegistroActivity.this, "Registro Exitoso.", Toast.LENGTH_SHORT).show();
+
+                                                        Map<String, Object> map = new HashMap<>();
+                                                        map.put("Uso", "1");
+                                                        mDatabase.child("Users").child(UsuarioCompanya).child("Codigos").child(Codigo).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task2) {
+                                                                Toast.makeText(RegistroActivity.this, "Registro Exitoso.", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
                                                     } else {
                                                         Toast.makeText(RegistroActivity.this, "Error al momento de crear Datos.", Toast.LENGTH_SHORT).show();
                                                     }
