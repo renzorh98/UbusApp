@@ -1,34 +1,22 @@
 package com.example.sec_login;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.core.app.ActivityCompat;
+
 import androidx.fragment.app.FragmentActivity;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.widget.CheckBox;
+import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.Toast;
 
-import com.facebook.AccessTokenTracker;
-import com.facebook.CallbackManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,8 +27,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -61,7 +48,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationClient;
     LatLng uPos;
     RadioGroup RGlistadoCompanyas;
-    private int contadorChecks=0;
+
     private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
 
     /*CONNEXION FIREBASE*/
@@ -72,11 +59,18 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Marker> Markers = new ArrayList<Marker>();
 
     private ArrayList<Polyline> tmpPolyline = new ArrayList<Polyline>();
-    private ArrayList<Polyline> Polynes = new ArrayList<Polyline>();
+    private ArrayList<Polyline> Polylines = new ArrayList<Polyline>();
+
+    Marker ini;
+    Marker end;
 
     CountDownTimer Count;
     private int RBquery = 0;
     private String RouteQuery = "null";
+    private Polyline RouteVuelta;
+    private Polyline RouteIda;
+    ImageView imageView;
+
 
     @Override
     public void onBackPressed() {
@@ -166,8 +160,20 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        imageView = (ImageView)findViewById(R.id.center);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapCenter(mMap);
+            }
+        });
 
 
+
+    }
+
+    private void MapCenter(GoogleMap mMap) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
     }
 
     /**
@@ -181,15 +187,36 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Count.cancel();
         mMap = googleMap;
-
         if(RBquery == 1){
+            for(Polyline poly: Polylines){
+                poly.remove();
+            }
+            try {
+                RouteIda.remove();
+                RouteVuelta.remove();
+                ini.remove();
+                end.remove();
+            }catch (NullPointerException e){
+
+            }
+
+            Count.cancel();
             polyLineMap(mMap,RouteQuery,"Ida");
             polyLineMap(mMap,RouteQuery,"Vuelta");
+            Polylines.clear();
+            Polylines.addAll(tmpPolyline);
+
+            //tmpPolyline.clear();
         }
+        else {
+            Log.e("msg2", "latitude "+Latitude+" Longitude "+Longitude);
+            uPos = new LatLng(Latitude, Longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
+        }
+        /*Log.e("msg2", "latitude "+Latitude+" Longitude "+Longitude);
         uPos = new LatLng(Latitude, Longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));*/
 
         markerMap(mMap);
     }
@@ -269,16 +296,24 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
         mDatabase.child("Ruta").child(ruta).child(ida_vuelta).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
                 ArrayList<BusPosition> Ruta = new ArrayList<>();
+
                 Ruta.addAll(StringToArray(dataSnapshot.getValue(String.class)));
+                Latitude = Ruta.get((int)Ruta.size()/2).getLatitud();
+                Longitude = Ruta.get((int)Ruta.size()/2).getLongitud();
+                Log.e("msg1", "latitude "+Latitude+" Longitude "+Longitude);
+                uPos = new LatLng(Latitude, Longitude);
+                gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
+
                 PolylineOptions polylineOptions = new PolylineOptions();
                 for(int i = 0; i < Ruta.size()-1; i++){
                     if(ida_vuelta.equals("Ida")){
                         if(i==0){
                             MarkerOptions markeroptions = new MarkerOptions();
                             markeroptions.position(new LatLng(Ruta.get(0).getLatitud(),Ruta.get(0).getLongitud())).title(
-                                    "Inicio").snippet("Ruta: "+ruta);
-                            gMap.addMarker(markeroptions);
+                                    "Inicio Ida").snippet("Ruta: "+ruta);
+                            ini = gMap.addMarker(markeroptions);
                         }
                         polylineOptions.add(new LatLng(Ruta.get(i).getLatitud(),Ruta.get(i).getLongitud()),
                                 new LatLng(Ruta.get(i+1).getLatitud(),Ruta.get(i+1).getLongitud())).color(Color.RED).width(7);
@@ -287,15 +322,21 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                         if(i==Ruta.size()-2){
                             MarkerOptions markeroptions = new MarkerOptions();
                             markeroptions.position(new LatLng(Ruta.get(0).getLatitud(),Ruta.get(0).getLongitud())).title(
-                                    "Fin").snippet("Ruta: "+ruta);
-                            gMap.addMarker(markeroptions);
+                                    "Inicio Vuelta").snippet("Ruta: "+ruta);
+                            end = gMap.addMarker(markeroptions);
                         }
                         polylineOptions.add(new LatLng(Ruta.get(i).getLatitud(),Ruta.get(i).getLongitud()),
                                 new LatLng(Ruta.get(i+1).getLatitud(),Ruta.get(i+1).getLongitud())).color(Color.BLUE).width(7);
                     }
 
                 }
-                gMap.addPolyline(polylineOptions);
+                if(ida_vuelta.equals("Ida")){
+                    RouteIda = gMap.addPolyline(polylineOptions);
+                }
+                else{
+                    RouteVuelta = gMap.addPolyline(polylineOptions);
+                }
+
             }
 
             @Override
