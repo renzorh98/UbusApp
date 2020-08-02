@@ -11,7 +11,8 @@
         android:id="@+id/ActivarGPS"
         android:layout_width="197dp"
         android:layout_height="49dp"
-        android:text="Activar GPS"
+        android:background="#D82C2C"
+        android:text="GPS Off"
         tools:layout_editor_absoluteX="36dp"
         tools:layout_editor_absoluteY="33dp" />
 

@@ -12,8 +12,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.login.widget.LoginButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class OperacionesActivity extends AppCompatActivity {
+    private String ID;
+    private int tipoUsuario;
     /*PARTES VISTA*/
     private Button BActivarGPS;
     private Button BSeleccionRuta;
@@ -21,13 +26,19 @@ public class OperacionesActivity extends AppCompatActivity {
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
     private LocationManager locationManager;
-    private int tipoUsuario;
+
     /*FIN VARIABLES*/
+    FirebaseAuth mAuth;
+    DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_operaciones);
+        mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        ID=mAuth.getCurrentUser().getUid();
+
         tipoUsuario = this.getIntent().getExtras().getInt("tipoUsuario");
         locationManager=(LocationManager)getSystemService(LOCATION_SERVICE);
 

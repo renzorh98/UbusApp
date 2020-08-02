@@ -244,7 +244,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                                     MarkerOptions markeroptions = new MarkerOptions();
                                     markeroptions.position(new LatLng(lat,lon)).title(
                                             ""+dataSnapshot2.child("email").getValue()).snippet(
-                                            "Unidad de transporte: "+dataSnapshot2.child("user").getValue()).icon(
+                                            "Unidad de transporte: "+dataSnapshot2.child("user").getValue()+"\nCompañia: "+dataSnapshot2.child("companya").getValue()).icon(
                                             BitmapDescriptorFactory.fromResource(R.drawable.bus));
                                     tmpMarker.add(gMap.addMarker(markeroptions));
                                 }
@@ -349,7 +349,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
         String str[] = Sruta.split(";");
         ArrayList<BusPosition> ret = new ArrayList<>();
         ret.clear();
-        for(String s: str){
+            for(String s: str){
             BusPosition bp = new BusPosition();
             String aux[] = s.split(",");
             bp.setLatitud(Double.parseDouble(aux[0]));

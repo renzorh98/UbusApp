@@ -14,14 +14,6 @@
         android:layout_height="match_parent"
         tools:context=".rutaInterfaz" />
 
-    <TextView
-        android:id="@+id/Seleccion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Seleccione compañia"
-        android:textColor="?attr/actionModeSplitBackground" />
-
     <ImageView
         android:id="@+id/center"
         android:layout_width="wrap_content"
@@ -33,7 +25,6 @@
         android:background="#00FFFFFF"
         android:src="@drawable/center"
         />
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,31 +52,48 @@
             android:text="Ida" />
     </LinearLayout>
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:layout_marginTop="27dp"
-        android:background="#4006F3D7">
+        android:layout_height="wrap_content"
+        android:background="#4006ECCA"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical"
+        >
 
-
-        <LinearLayout
+        <TextView
+            android:id="@+id/Seleccion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:text="Seleccione compañia"
+            android:textColor="#000000" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_below="@+id/Seleccion"
+            android:layout_marginTop="0dp">
 
 
-            <RadioGroup
-                android:id="@+id/ListadoCompanias"
-                android:layout_width="match_parent"
-                android:layout_height="490dp">
-
-            </RadioGroup>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
 
-        </LinearLayout>
+                <RadioGroup
+                    android:id="@+id/ListadoCompanias"
+                    android:layout_width="match_parent"
+                    android:layout_height="490dp">
+
+                </RadioGroup>
 
 
-    </ScrollView>
+            </LinearLayout>
+
+
+        </ScrollView>
+    </LinearLayout>
 
 
 
