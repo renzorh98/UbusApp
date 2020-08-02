@@ -24,16 +24,19 @@
 
             <TextView
                 android:id="@+id/Seleccion"
-                android:layout_width="259dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Seleccione compañia y la Ruta" />
+                android:text="Seleccione compañia y la Ruta"
+                android:gravity="center"
+                android:textColor="@color/com_facebook_blue"
+                />
 
-            <TableLayout
+            <RadioGroup
                 android:id="@+id/ListadoCompanias"
                 android:layout_width="match_parent"
                 android:layout_height="574dp">
 
-            </TableLayout>
+            </RadioGroup>
 
 
         </LinearLayout>

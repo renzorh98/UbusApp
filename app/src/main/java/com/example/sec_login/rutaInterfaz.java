@@ -1,12 +1,14 @@
 package com.example.sec_login;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,7 +17,9 @@ import android.os.CountDownTimer;
 import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -52,11 +56,11 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
     boolean control = false;
 
     private GoogleMap mMap;
-    public double Latitude;
-    public double Longitude;
+    public double Latitude = -16.4040495;
+    public double Longitude = -71.5740311;
     private FusedLocationProviderClient mFusedLocationClient;
     LatLng uPos;
-    TableLayout TListadoCompanyas;
+    RadioGroup RGlistadoCompanyas;
     private int contadorChecks=0;
     private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
 
@@ -71,6 +75,9 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<Polyline> Polynes = new ArrayList<Polyline>();
 
     CountDownTimer Count;
+    private int RBquery = 0;
+    private String RouteQuery = "null";
+
     @Override
     public void onBackPressed() {
         Count.cancel();
@@ -106,8 +113,8 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        TListadoCompanyas=(TableLayout)findViewById(R.id.ListadoCompanias);
-        TListadoCompanyas.setStretchAllColumns(true);
+        RGlistadoCompanyas=(RadioGroup)findViewById(R.id.ListadoCompanias);
+
         Query mData = mDatabase.child("Users");
         mData.addValueEventListener(new ValueEventListener(){
             @Override
@@ -117,75 +124,29 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                     try {
                         int tipo = data.child("tipo").getValue(Integer.class);
                         if (tipo == 1) {
-                            String companya= data.child("user").getValue(String.class);
-                            TableRow row=new TableRow(getApplicationContext());
-                            CheckBox cb=new CheckBox(getApplicationContext());
-                            cb.setText(companya);
-                            cb.setId(i);
-                            cb.setTextColor(Color.BLACK);
-                            cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                            final String companya= data.child("user").getValue(String.class);
+                            final RadioButton rb = new RadioButton(getApplicationContext());
+                            rb.setText(companya);
+                            rb.setId(i);
+                            rb.setTextColor(Color.BLACK);
+                            rb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                    if(contadorChecks<1) {
-                                        String companya=buttonView.getText().toString();
-                                        if (isChecked){
-                                            contadorChecks++;
-                                            int ID=buttonView.getId();
-                                            Seleccion s=new Seleccion();
-                                            s.posicion=ListaCompanyas.size();
-                                            s.ID=buttonView.getId();
-                                            s.Companya=buttonView.getText().toString();
-                                            ListaCompanyas.add(s);
-                                            TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
-                                            Switch sw=new Switch(getApplicationContext());
-                                            sw.setText("Ida / Vuelta");
-                                            sw.setId(buttonView.getId());
-                                            sw.setTextColor(Color.BLACK);
-                                            sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                @Override
-                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                    int ID=buttonView.getId();
-                                                    for(int i=0;i<ListaCompanyas.size();i++){
-                                                        if(ListaCompanyas.get(i).ID==ID){
-                                                            if(isChecked){
-                                                                ListaCompanyas.get(i).Vuelta=true;
-                                                            }else{
-                                                                ListaCompanyas.get(i).Vuelta=false;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            });
-                                            row.addView(sw);
-                                        }else{
-                                            contadorChecks--;
-                                            for(int i=0;i<ListaCompanyas.size();i++){
-                                                if(ListaCompanyas.get(i).Companya.equalsIgnoreCase(companya)){
-                                                    ListaCompanyas.remove(i);
-                                                }
-                                            }
-                                            TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
-                                            row.removeViewAt(1);
-                                        }
-                                    }else if(contadorChecks==1 && isChecked){
-                                        Toast.makeText(rutaInterfaz.this,"Maximo 1 compañia.", Toast.LENGTH_SHORT).show();
+                                    if(isChecked==true){
+                                        Log.e("Mensaje","select "+companya);
+                                        RBquery = 1;
+                                        RouteQuery = companya;
+                                        onMapReady(mMap);
+
                                     }
-                                    else if(contadorChecks==1 && !isChecked){
-                                        contadorChecks--;
-                                        String companya=buttonView.getText().toString();
-                                        for(int i=0;i<ListaCompanyas.size();i++){
-                                            if(ListaCompanyas.get(i).Companya.equalsIgnoreCase(companya)){
-                                                ListaCompanyas.remove(i);
-                                            }
-                                        }
-                                        TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
-                                        row.removeViewAt(1);
+                                    else{
+                                        Log.e("Mensaje","unselect "+companya);
+
                                     }
                                 }
                             });
+                            RGlistadoCompanyas.addView(rb);
 
-                            row.addView(cb);
-                            TListadoCompanyas.addView(row);
                             i++;
                         }
                     }catch (Exception e){continue;
@@ -220,57 +181,17 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Count.cancel();
         mMap = googleMap;
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+
+        if(RBquery == 1){
+            polyLineMap(mMap,RouteQuery,"Ida");
+            polyLineMap(mMap,RouteQuery,"Vuelta");
         }
-        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if(location != null){
-                    Latitude = location.getLatitude();
-                    Longitude = location.getLongitude();
-                    //Log.e("",Latitude+","+Longitude);
-
-                    if (ActivityCompat.checkSelfPermission(rutaInterfaz.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(rutaInterfaz.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    mMap.setMyLocationEnabled(true);
-                    uPos = new LatLng(Latitude, Longitude);
-                    //mMap.addMarker(new MarkerOptions().position(uPos).title("Posicion Actual"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
-                }
-            }
-        });
-
-        /*
-       GRAFICA TODAS LAS UNIDADES DE TRANSPORTE QUE SE TIENEN EN EL FIREBASE
-         */
-
-
-
-        //EN UN FOR SE DEBERIA REALIZAR LA INVOCACION DE ESTE METODO EJM
-        /*
-        Clase seleccion{
-            compania
-            ruta
-            ida_vuelta
-        }
-        List = {seleccion1, seleccion2, seleccion3}
-        for(seleccion e: List):
-            polyLineMap(mMap, e.compania, e.ruta, e.ida_vuelta)
-         */
-
-        //polyLineMap(mMap, "Cerro_Colorado_SAC", "RUTA_E_06A", "Ida");
-        //polyLineMap(mMap, "Cerro_Colorado_SAC", "RUTA_E_06A", "Vuelta");
-        polyLineMap(mMap, "DICA", "Ida");
-        polyLineMap(mMap, "DICC", "Vuelta");
+        uPos = new LatLng(Latitude, Longitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
 
         markerMap(mMap);
-        //Log.e("Msng", "termine");
-
-
     }
 
     private void markerMap(final GoogleMap gMap){
@@ -344,7 +265,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    private void polyLineMap(final GoogleMap gMap, String ruta, final String ida_vuelta){
+    private void polyLineMap(final GoogleMap gMap, final String ruta, final String ida_vuelta){
         mDatabase.child("Ruta").child(ruta).child(ida_vuelta).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -353,10 +274,22 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                 PolylineOptions polylineOptions = new PolylineOptions();
                 for(int i = 0; i < Ruta.size()-1; i++){
                     if(ida_vuelta.equals("Ida")){
+                        if(i==0){
+                            MarkerOptions markeroptions = new MarkerOptions();
+                            markeroptions.position(new LatLng(Ruta.get(0).getLatitud(),Ruta.get(0).getLongitud())).title(
+                                    "Inicio").snippet("Ruta: "+ruta);
+                            gMap.addMarker(markeroptions);
+                        }
                         polylineOptions.add(new LatLng(Ruta.get(i).getLatitud(),Ruta.get(i).getLongitud()),
                                 new LatLng(Ruta.get(i+1).getLatitud(),Ruta.get(i+1).getLongitud())).color(Color.RED).width(7);
                     }
                     else if(ida_vuelta.equals("Vuelta")){
+                        if(i==Ruta.size()-2){
+                            MarkerOptions markeroptions = new MarkerOptions();
+                            markeroptions.position(new LatLng(Ruta.get(0).getLatitud(),Ruta.get(0).getLongitud())).title(
+                                    "Fin").snippet("Ruta: "+ruta);
+                            gMap.addMarker(markeroptions);
+                        }
                         polylineOptions.add(new LatLng(Ruta.get(i).getLatitud(),Ruta.get(i).getLongitud()),
                                 new LatLng(Ruta.get(i+1).getLatitud(),Ruta.get(i+1).getLongitud())).color(Color.BLUE).width(7);
                     }

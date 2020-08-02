@@ -114,7 +114,7 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        /*mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -135,11 +135,11 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
                 }
             }
-        });*/
-        //COMENTAR
+        });
+       /* //COMENTAR
         uPos = new LatLng(-16.37298,-71.508553);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
-        //COMENTAR
+        //COMENTAR*/
 
         for (Seleccion s:ListaCompanyas) {
             polyLineMap(mMap,s.Companya,(s.Vuelta?"Vuelta":"Ida"));
