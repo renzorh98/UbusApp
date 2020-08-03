@@ -3,8 +3,8 @@ package com.example.sec_login;
 public class BusPosition {
     private double Latitud;
     private double Longitud;
-    private double DistanciaConCiudadano=Double.POSITIVE_INFINITY;
-    private double DistanciaConLaRuta=Double.POSITIVE_INFINITY;
+    public double DistanciaConCiudadano=Double.POSITIVE_INFINITY;
+    public double DistanciaConLaRuta=Double.POSITIVE_INFINITY;
 
     BusPosition(){
 

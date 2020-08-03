@@ -56,7 +56,8 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     private CallbackManager mCallbackManager;
     private AccessTokenTracker accessTokenTracker;
     /*FIN CONNEXION FIREBASE*/
-
+    private  Location locato;
+    private GoogleMap goMap;
     private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
     private ArrayList<Marker> tmpMarker = new ArrayList<Marker>();
     private ArrayList<Marker> Markers = new ArrayList<Marker>();
@@ -119,27 +120,76 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
         mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                if(location != null){
-                    Latitude = -16.387612;// location.getLatitude();
-                    Longitude = -71.532984;// location.getLongitude();
-                    if (ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                            != PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-                                    != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    mMap.setMyLocationEnabled(true);
-                    uPos = new LatLng(Latitude, Longitude);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
-                }
+                locato=location;
+                CalculoDeUbicaciones(location);
             }
         });
         markerMap(mMap);
     }
+    private void CalculoDeUbicaciones(Location location){
 
+        if(location != null){
+            Latitude = -16.387612;// location.getLatitude();
+            Longitude = -71.532984;// location.getLongitude();
+            if (ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+            uPos = new LatLng(Latitude, Longitude);
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
+            for (Seleccion s:ListaCompanyas) {
+                for (BusPosition bp:s.buses) {
+                    Double lat = bp.getLatitud();
+                    Double lon = bp.getLongitud();
+                    bp.DistanciaConCiudadano=distanciaCoord(Latitude,Longitude,lat,lon);
+                    if(s.CercanosCiudadano.size()<3){
+                        if(s.CercanosCiudadano.size()==1){
+                            if(s.CercanosCiudadano.get(0).DistanciaConCiudadano>bp.DistanciaConCiudadano){
+                                s.CercanosCiudadano.add(0,bp);
+                            }else{
+                                s.CercanosCiudadano.add(bp);
+                            }
+                        }else {
+                            s.CercanosCiudadano.add(bp);
+                        }
+                    }else{
+                        if(s.CercanosCiudadano.get(0).DistanciaConCiudadano>bp.DistanciaConCiudadano){
+                            s.CercanosCiudadano.add(0,bp);
+                            s.CercanosCiudadano.remove(2);
+                        }else if(s.CercanosCiudadano.get(1).DistanciaConCiudadano>bp.DistanciaConCiudadano){
+                            s.CercanosCiudadano.add(1,bp);
+                            s.CercanosCiudadano.remove(2);
+                        }
+                    }
+                }
+            }
+            for (Seleccion s:ListaCompanyas) {
+                int i=0;
+                //polyLineMap(mMap,s.Companya,(s.Vuelta?"Vuelta":"Ida"),s.CercanosCiudadano);
+                for (BusPosition bp:s.CercanosCiudadano) {
+                    Double lat = bp.getLatitud();
+                    Double lon = bp.getLongitud();
+                    MarkerOptions markeroptions = new MarkerOptions();
+                    markeroptions.position(new LatLng(lat, lon)).title(
+                            "" + s.Companya).snippet(
+                            "Unidad de transporte: " + s.Placas.get(i)).icon(
+                            BitmapDescriptorFactory.fromResource(R.drawable.bus));
+                    tmpMarker.add(goMap.addMarker(markeroptions));
+
+                    Markers.clear();
+                    Markers.addAll(tmpMarker);
+                    i++;
+                }
+            }
+        }
+    }
     private void markerMap(final GoogleMap gMap){
         // CONSULTA A LA BASE DE DATOS DE LA UBICACION DE LAS UNIDADES
         Query mData = mDatabase.child("Users");
+        goMap=gMap;
         mData.addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot){
@@ -167,27 +217,8 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
                         }
                     }catch (Exception e){continue;}
                 }
-                for (Seleccion s:ListaCompanyas) {
-                    polyLineMap(mMap,s.Companya,(s.Vuelta?"Vuelta":"Ida"));
-                    //str+=s.ID+" "+s.Companya+" "+(s.Vuelta?"Vuelta":"Ida");
-                }
-                for (Seleccion s:ListaCompanyas) {
-                    int i=0;
-                    for (BusPosition bp:s.buses) {
-                        Double lat = bp.getLatitud();
-                        Double lon = bp.getLongitud();
-                        MarkerOptions markeroptions = new MarkerOptions();
-                        markeroptions.position(new LatLng(lat, lon)).title(
-                                "" + s.Companya).snippet(
-                                "Unidad de transporte: " + s.Placas.get(i)).icon(
-                                BitmapDescriptorFactory.fromResource(R.drawable.bus));
-                        tmpMarker.add(gMap.addMarker(markeroptions));
 
-                        Markers.clear();
-                        Markers.addAll(tmpMarker);
-                        i++;
-                    }
-                }
+                CalculoDeUbicaciones(locato);
             }
 
             @Override
@@ -213,26 +244,19 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
             }
         }.start();
     }
-    private void polyLineMap(final GoogleMap gMap, String ruta, final String ida_vuelta){
+    private void polyLineMap(final GoogleMap gMap, String ruta, final String ida_vuelta, final ArrayList<BusPosition> cercanos){
         mDatabase.child("Ruta").child(ruta).child(ida_vuelta).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<BusPosition> Ruta = new ArrayList<>();
                 Ruta.addAll(StringToArray(dataSnapshot.getValue(String.class)));
                 PolylineOptions polylineOptions = new PolylineOptions();
+
                 for(int i = 0; i < Ruta.size()-1; i++){
+                    for (BusPosition bp:cercanos) {
 
-                    if(ida_vuelta.equals("Ida")){
-                        //polylineOptions.add(new LatLng(Ruta.get(i).getLatitud(),Ruta.get(i).getLongitud()),
-                        //        new LatLng(Ruta.get(i+1).getLatitud(),Ruta.get(i+1).getLongitud())).color(Color.RED).width(7);
                     }
-                    else if(ida_vuelta.equals("Vuelta")){
-                        //polylineOptions.add(new LatLng(Ruta.get(i).getLatitud(),Ruta.get(i).getLongitud()),
-                        //        new LatLng(Ruta.get(i+1).getLatitud(),Ruta.get(i+1).getLongitud())).color(Color.BLUE).width(7);
-                    }
-
                 }
-                //gMap.addPolyline(polylineOptions);
             }
 
             @Override

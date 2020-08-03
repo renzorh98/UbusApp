@@ -15,8 +15,7 @@ public class Seleccion implements Parcelable {
     public boolean Vuelta=false;
     public ArrayList<BusPosition> buses=new ArrayList<BusPosition>();
     public ArrayList<String> Placas=new ArrayList<String>();
-    public BusPosition PrimerCercano= new BusPosition();
-    public BusPosition SegundoCercano= new BusPosition();
+    public ArrayList<BusPosition> CercanosCiudadano= new ArrayList<BusPosition>();
     public Seleccion(){
 
     }
