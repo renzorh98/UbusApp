@@ -42,7 +42,7 @@ public class OperacionesActivity extends AppCompatActivity {
         tipoUsuario = this.getIntent().getExtras().getInt("tipoUsuario");
         locationManager=(LocationManager)getSystemService(LOCATION_SERVICE);
 
-        BActivarGPS=findViewById(R.id.AbrirOperaciones);
+        BActivarGPS=findViewById(R.id.ActivarGPS);
         BSeleccionRuta=findViewById(R.id.SeleccionRuta);
         try {
             if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -73,5 +73,18 @@ public class OperacionesActivity extends AppCompatActivity {
             }
         });
 
+        if(tipoUsuario==1){//Compañia
+            BActivarGPS.setVisibility(View.VISIBLE);
+            BSeleccionRuta.setVisibility(View.INVISIBLE);
+            BVerRuta.setVisibility(View.INVISIBLE);
+        }else if(tipoUsuario==2){//Transportista
+            BActivarGPS.setVisibility(View.VISIBLE);
+            BSeleccionRuta.setVisibility(View.INVISIBLE);
+            BVerRuta.setVisibility(View.INVISIBLE);
+        }else{//Ciudadano
+            BActivarGPS.setVisibility(View.VISIBLE);
+            BSeleccionRuta.setVisibility(View.VISIBLE);
+            BVerRuta.setVisibility(View.VISIBLE);
+        }
     }
 }

@@ -6,11 +6,17 @@ import android.os.Parcelable;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.ArrayList;
+
 public class Seleccion implements Parcelable {
     public int posicion;
     public int ID;
     public String Companya;
     public boolean Vuelta=false;
+    public ArrayList<BusPosition> buses=new ArrayList<BusPosition>();
+    public ArrayList<String> Placas=new ArrayList<String>();
+    public BusPosition PrimerCercano= new BusPosition();
+    public BusPosition SegundoCercano= new BusPosition();
     public Seleccion(){
 
     }

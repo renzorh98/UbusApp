@@ -65,12 +65,6 @@ public class ListadoActivity extends AppCompatActivity {
                 }catch (Exception e){
                     Toast.makeText(ListadoActivity.this, e.getMessage().toString(), Toast.LENGTH_SHORT).show();
                 }
-
-
-
-
-
-                //startActivity(new Intent(DatosActivity.this,OperacionesActivity.class));
             }
         });
         mData.addValueEventListener(new ValueEventListener(){
@@ -90,53 +84,39 @@ public class ListadoActivity extends AppCompatActivity {
                             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                    if(contadorChecks<3) {
-                                        String companya=buttonView.getText().toString();
-                                        if (isChecked){
-                                            contadorChecks++;
-                                            int ID=buttonView.getId();
-                                            Seleccion s=new Seleccion();
-                                            s.posicion=ListaCompanyas.size();
-                                            s.ID=buttonView.getId();
-                                            s.Companya=buttonView.getText().toString();
-                                            ListaCompanyas.add(s);
-                                            TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
-                                            Switch sw=new Switch(getApplicationContext());
-                                            sw.setText("Ida / Vuelta");
-                                            sw.setId(buttonView.getId());
-                                            sw.setTextColor(Color.BLACK);
-                                            sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                                @Override
-                                                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                    int ID=buttonView.getId();
-                                                    for(int i=0;i<ListaCompanyas.size();i++){
-                                                        if(ListaCompanyas.get(i).ID==ID){
-                                                            if(isChecked){
-                                                                ListaCompanyas.get(i).Vuelta=true;
-                                                            }else{
-                                                                ListaCompanyas.get(i).Vuelta=false;
-                                                            }
+                                if(contadorChecks<3) {
+                                    String companya=buttonView.getText().toString();
+                                    if (isChecked){
+                                        contadorChecks++;
+                                        int ID=buttonView.getId();
+                                        Seleccion s=new Seleccion();
+                                        s.posicion=ListaCompanyas.size();
+                                        s.ID=buttonView.getId();
+                                        s.Companya=buttonView.getText().toString();
+                                        ListaCompanyas.add(s);
+                                        TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
+                                        Switch sw=new Switch(getApplicationContext());
+                                        sw.setText("Ida / Vuelta");
+                                        sw.setId(buttonView.getId());
+                                        sw.setTextColor(Color.BLACK);
+                                        sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                            @Override
+                                            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                int ID=buttonView.getId();
+                                                for(int i=0;i<ListaCompanyas.size();i++){
+                                                    if(ListaCompanyas.get(i).ID==ID){
+                                                        if(isChecked){
+                                                            ListaCompanyas.get(i).Vuelta=true;
+                                                        }else{
+                                                            ListaCompanyas.get(i).Vuelta=false;
                                                         }
                                                     }
                                                 }
-                                            });
-                                            row.addView(sw);
-                                        }else{
-                                            contadorChecks--;
-                                            for(int i=0;i<ListaCompanyas.size();i++){
-                                                if(ListaCompanyas.get(i).Companya.equalsIgnoreCase(companya)){
-                                                    ListaCompanyas.remove(i);
-                                                }
                                             }
-                                            TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
-                                            row.removeViewAt(1);
-                                        }
-                                    }else if(contadorChecks==3 && isChecked){
-                                        Toast.makeText(ListadoActivity.this,"Maximo 3 compañias.", Toast.LENGTH_SHORT).show();
-                                    }
-                                    else if(contadorChecks==3 && !isChecked){
+                                        });
+                                        row.addView(sw);
+                                    }else{
                                         contadorChecks--;
-                                        String companya=buttonView.getText().toString();
                                         for(int i=0;i<ListaCompanyas.size();i++){
                                             if(ListaCompanyas.get(i).Companya.equalsIgnoreCase(companya)){
                                                 ListaCompanyas.remove(i);
@@ -145,6 +125,20 @@ public class ListadoActivity extends AppCompatActivity {
                                         TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
                                         row.removeViewAt(1);
                                     }
+                                }else if(contadorChecks==3 && isChecked){
+                                    Toast.makeText(ListadoActivity.this,"Maximo 3 compañias.", Toast.LENGTH_SHORT).show();
+                                }
+                                else if(contadorChecks==3 && !isChecked){
+                                    contadorChecks--;
+                                    String companya=buttonView.getText().toString();
+                                    for(int i=0;i<ListaCompanyas.size();i++){
+                                        if(ListaCompanyas.get(i).Companya.equalsIgnoreCase(companya)){
+                                            ListaCompanyas.remove(i);
+                                        }
+                                    }
+                                    TableRow row= (TableRow) TListadoCompanyas.getChildAt(buttonView.getId());
+                                    row.removeViewAt(1);
+                                }
                                 }
                             });
 
