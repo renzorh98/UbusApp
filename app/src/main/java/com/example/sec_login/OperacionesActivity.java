@@ -1,22 +1,30 @@
 package com.example.sec_login;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
+import android.os.CountDownTimer;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class OperacionesActivity extends AppCompatActivity {
+    private int WORK = 0;
     private String ID;
     private int tipoUsuario;
     /*PARTES VISTA*/
@@ -31,6 +39,18 @@ public class OperacionesActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     DatabaseReference mDatabase;
 
+    FusedLocationProviderClient mFusedLocationClient;
+    private CountDownTimer Count;
+
+    @Override
+    protected void onResume() {
+        if(WORK == 1){
+            BActivarGPS.setText("GPS ON");
+            BActivarGPS.setBackgroundColor(Color.GREEN);
+        }
+        super.onResume();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,18 +64,30 @@ public class OperacionesActivity extends AppCompatActivity {
 
         BActivarGPS=findViewById(R.id.ActivarGPS);
         BSeleccionRuta=findViewById(R.id.SeleccionRuta);
-        try {
-            if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                BActivarGPS.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+        BActivarGPS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(tipoUsuario == 2){
+                    if(WORK == 0) {
+                        BActivarGPS.setText("GPS ON");
+                        BActivarGPS.setBackgroundColor(Color.GREEN);
+                        WORK = 1;
+                        startWorkGps(ID);
                     }
-                });
-            } else {
-                BActivarGPS.setVisibility(View.INVISIBLE);
+                    else if(WORK == 1){
+                        BActivarGPS.setText("GPS OFF");
+                        BActivarGPS.setBackgroundColor(Color.RED);
+                        Count.cancel();
+                        WORK = 0;
+                    }
+
+                }
+                else if(tipoUsuario != 2){
+                    Toast.makeText(OperacionesActivity.this, "Funcion solo para transportistas.",Toast.LENGTH_SHORT).show();
+                }
             }
-        }catch (Exception e){}
+        });
+
         BSeleccionRuta.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,5 +118,44 @@ public class OperacionesActivity extends AppCompatActivity {
             BSeleccionRuta.setVisibility(View.VISIBLE);
             BVerRuta.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void startWorkGps(final String id) {
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location != null){
+                    Log.e("",location.getLatitude()+","+location.getLongitude());
+                    mDatabase.child("Users").child(id).child("Ubicacion").child("Latitud").setValue(location.getLatitude());
+                    mDatabase.child("Users").child(id).child("Ubicacion").child("Longitud").setValue(location.getLongitude());
+
+
+                    if (ActivityCompat.checkSelfPermission(OperacionesActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(OperacionesActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+
+                }
+            }
+        });
+        countDownTimer();
+    }
+    private void countDownTimer(){
+        Count = new CountDownTimer(5000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.e("seconds remaining: ", ""+millisUntilFinished/1000);
+
+            }
+
+            @Override
+            public void onFinish() {
+                startWorkGps(ID);
+            }
+        }.start();
+
     }
 }

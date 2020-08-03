@@ -129,8 +129,8 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     private void CalculoDeUbicaciones(Location location){
 
         if(location != null){
-            Latitude = -16.387612;// location.getLatitude();
-            Longitude = -71.532984;// location.getLongitude();
+            Latitude = location.getLatitude();
+            Longitude = location.getLongitude();
             if (ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_COARSE_LOCATION)

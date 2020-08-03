@@ -218,10 +218,10 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
         uPos = new LatLng(Latitude, Longitude);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));*/
 
-        markerMap(mMap);
+        markerMap(mMap,RouteQuery);
     }
 
-    private void markerMap(final GoogleMap gMap){
+    private void markerMap(final GoogleMap gMap, final String queryRoute){
 
         // CONSULTA A LA BASE DE DATOS DE LA UBICACION DE LAS UNIDADES
         mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
@@ -235,7 +235,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
                             //Log.e("asdasd",""+dataSnapshot2.child("tipo").getValue(Integer.class));
-                            if(2 == dataSnapshot2.child("tipo").getValue(Integer.class)){
+                            if(2 == dataSnapshot2.child("tipo").getValue(Integer.class) && dataSnapshot2.child("Companya").getValue(String.class).equals(queryRoute)){
                                 try {
                                     BusPosition bp = dataSnapshot2.child("Ubicacion").getValue(BusPosition.class);
                                     Double lat = bp.getLatitud();
@@ -244,7 +244,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                                     MarkerOptions markeroptions = new MarkerOptions();
                                     markeroptions.position(new LatLng(lat,lon)).title(
                                             ""+dataSnapshot2.child("email").getValue()).snippet(
-                                            "Unidad de transporte: "+dataSnapshot2.child("user").getValue()+"\nCompañia: "+dataSnapshot2.child("companya").getValue()).icon(
+                                            "Unidad de transporte: "+dataSnapshot2.child("user").getValue()+"\nCompañia: "+dataSnapshot2.child("Companya").getValue()).icon(
                                             BitmapDescriptorFactory.fromResource(R.drawable.bus));
                                     tmpMarker.add(gMap.addMarker(markeroptions));
                                 }
@@ -285,7 +285,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onFinish() {
-                markerMap(mMap);
+                markerMap(mMap, RouteQuery);
                 //Toast.makeText(rutaInterfaz.this, "Actualizando", Toast.LENGTH_SHORT).show();
             }
         }.start();
