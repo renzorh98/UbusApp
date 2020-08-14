@@ -1,21 +1,16 @@
 package com.example.sec_login;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.location.Location;
-import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Parcelable;
-import android.util.Log;
-import android.widget.Toast;
-
-import com.facebook.AccessTokenTracker;
-import com.facebook.CallbackManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -26,8 +21,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -43,8 +36,8 @@ import java.util.List;
 public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
     boolean control = false;
-    public double Latitude;
-    public double Longitude;
+    private double Lati;
+    private double Long;
     private FusedLocationProviderClient mFusedLocationClient;
     LatLng uPos;
     String str="";
@@ -52,18 +45,13 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     /*CONNEXION FIREBASE*/
     FirebaseAuth mAuth;
     DatabaseReference mDatabase;
-    private FirebaseAuth.AuthStateListener mAuthState;
-    private CallbackManager mCallbackManager;
-    private AccessTokenTracker accessTokenTracker;
+
     /*FIN CONNEXION FIREBASE*/
     private  Location locato;
     private GoogleMap goMap;
     private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
     private ArrayList<Marker> tmpMarker = new ArrayList<Marker>();
     private ArrayList<Marker> Markers = new ArrayList<Marker>();
-
-    private ArrayList<Polyline> tmpPolyline = new ArrayList<Polyline>();
-    private ArrayList<Polyline> Polynes = new ArrayList<Polyline>();
 
     CountDownTimer Count;
     @Override
@@ -129,8 +117,8 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
     private void CalculoDeUbicaciones(Location location){
 
         if(location != null){
-            Latitude = location.getLatitude();
-            Longitude = location.getLongitude();
+            Lati = location.getLatitude();
+            Long = location.getLongitude();
             if (ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(BusesCercanos.this, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -138,13 +126,13 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
                 return;
             }
             mMap.setMyLocationEnabled(true);
-            uPos = new LatLng(Latitude, Longitude);
+            uPos = new LatLng(Lati, Long);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
             for (Seleccion s:ListaCompanyas) {
                 for (BusPosition bp:s.buses) {
                     Double lat = bp.getLatitud();
                     Double lon = bp.getLongitud();
-                    bp.DistanciaConCiudadano=distanciaCoord(Latitude,Longitude,lat,lon);
+                    bp.DistanciaConCiudadano=distanciaCoord(Lati,Long,lat,lon);
                     if(s.CercanosCiudadano.size()<3){
                         if(s.CercanosCiudadano.size()==1){
                             if(s.CercanosCiudadano.get(0).DistanciaConCiudadano>bp.DistanciaConCiudadano){
@@ -168,7 +156,6 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
             }
             for (Seleccion s:ListaCompanyas) {
                 int i=0;
-                //polyLineMap(mMap,s.Companya,(s.Vuelta?"Vuelta":"Ida"),s.CercanosCiudadano);
                 for (BusPosition bp:s.CercanosCiudadano) {
                     Double lat = bp.getLatitud();
                     Double lon = bp.getLongitud();
@@ -204,14 +191,16 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
                                 try {
                                     int IdaVuelta=s.Vuelta?1:0;
                                     int DataIdaVuelta=data.child("Ubicacion").child("IdaVuelta").getValue(Integer.class);
-                                    String placa=data.child("user").getValue().toString();
+
                                     if (s.Companya.equalsIgnoreCase(data.child("Companya").getValue().toString())
                                     && IdaVuelta==DataIdaVuelta) {
                                         s.buses.add(data.child("Ubicacion").getValue(BusPosition.class));
                                         s.Placas.add(data.child("user").getValue().toString());
                                         break;
                                     }
-                                }catch (Exception e){}
+                                }catch (Exception e){
+                                    Log.e("Mensaje", e.toString());
+                                }
                             }
 
                         }
@@ -244,41 +233,7 @@ public class    BusesCercanos extends AppCompatActivity implements OnMapReadyCal
             }
         }.start();
     }
-    private void polyLineMap(final GoogleMap gMap, String ruta, final String ida_vuelta, final ArrayList<BusPosition> cercanos){
-        mDatabase.child("Ruta").child(ruta).child(ida_vuelta).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<BusPosition> Ruta = new ArrayList<>();
-                Ruta.addAll(StringToArray(dataSnapshot.getValue(String.class)));
-                PolylineOptions polylineOptions = new PolylineOptions();
 
-                for(int i = 0; i < Ruta.size()-1; i++){
-                    for (BusPosition bp:cercanos) {
-
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-    }
-
-    private ArrayList<BusPosition> StringToArray(String Sruta){
-        String str[] = Sruta.split(";");
-        ArrayList<BusPosition> ret = new ArrayList<>();
-        ret.clear();
-        for(String s: str){
-            BusPosition bp = new BusPosition();
-            String aux[] = s.split(",");
-            bp.setLatitud(Double.parseDouble(aux[0]));
-            bp.setLongitud(Double.parseDouble(aux[1]));
-            ret.add(bp);
-        }
-        return ret;
-    }
     public static double distanciaCoord(double lat1, double lng1, double lat2, double lng2) {
         //double radioTierra = 3958.75;//en millas
         double radioTierra = 6371;//en kilómetros

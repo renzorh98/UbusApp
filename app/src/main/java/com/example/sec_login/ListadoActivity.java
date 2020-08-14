@@ -1,14 +1,8 @@
 package com.example.sec_login;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -18,7 +12,9 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,9 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListadoActivity extends AppCompatActivity {
     /*PARTES VISTA*/
@@ -88,7 +82,6 @@ public class ListadoActivity extends AppCompatActivity {
                                     String companya=buttonView.getText().toString();
                                     if (isChecked){
                                         contadorChecks++;
-                                        int ID=buttonView.getId();
                                         Seleccion s=new Seleccion();
                                         s.posicion=ListaCompanyas.size();
                                         s.ID=buttonView.getId();

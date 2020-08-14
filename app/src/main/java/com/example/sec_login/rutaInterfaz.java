@@ -1,11 +1,6 @@
 package com.example.sec_login;
 
-import androidx.annotation.NonNull;
-
-import androidx.fragment.app.FragmentActivity;
-
 import android.graphics.Color;
-
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -15,7 +10,8 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,7 +23,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,23 +31,22 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback {
     boolean control = false;
 
     private GoogleMap mMap;
-    public double Latitude = -16.4040495;
-    public double Longitude = -71.5740311;
-    private FusedLocationProviderClient mFusedLocationClient;
+    private double Lati;
+    private double Long;
+
     LatLng uPos;
     RadioGroup RGlistadoCompanyas;
 
-    private List<Seleccion> ListaCompanyas=new ArrayList<Seleccion>();
 
     /*CONNEXION FIREBASE*/
     DatabaseReference mDatabase;
+    Query mData;
     /*FIN CONNEXION FIREBASE*/
 
     private ArrayList<Marker> tmpMarker = new ArrayList<Marker>();
@@ -80,7 +74,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onResume() {
-        if(control == true) {
+        if(control) {
             countDownTimer();
             control = false;
         }
@@ -102,6 +96,8 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Lati = -16.4040495;
+        Long = -71.5740311;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ruta_interfaz);
 
@@ -109,7 +105,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
         RGlistadoCompanyas=(RadioGroup)findViewById(R.id.ListadoCompanias);
 
-        Query mData = mDatabase.child("Users");
+        mData = mDatabase.child("Users");
         mData.addValueEventListener(new ValueEventListener(){
             @Override
             public void onDataChange(DataSnapshot dataSnapshot){
@@ -127,14 +123,9 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                                 @Override
                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                     if(isChecked==true){
-                                        Log.e("Mensaje","select "+companya);
                                         RBquery = 1;
                                         RouteQuery = companya;
                                         onMapReady(mMap);
-
-                                    }
-                                    else{
-                                        Log.e("Mensaje","unselect "+companya);
 
                                     }
                                 }
@@ -143,13 +134,16 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
                             i++;
                         }
-                    }catch (Exception e){continue;
+                    }catch (Exception e){
+                        continue;
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Mensaje", databaseError.toString());
+
 
             }
         });
@@ -198,7 +192,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                 ini.remove();
                 end.remove();
             }catch (NullPointerException e){
-
+                Log.e("Mensajenullexec", e.toString());
             }
 
             Count.cancel();
@@ -207,16 +201,13 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
             Polylines.clear();
             Polylines.addAll(tmpPolyline);
 
-            //tmpPolyline.clear();
+
         }
         else {
-            Log.e("msg2", "latitude "+Latitude+" Longitude "+Longitude);
-            uPos = new LatLng(Latitude, Longitude);
+            uPos = new LatLng(Lati, Long);
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
         }
-        /*Log.e("msg2", "latitude "+Latitude+" Longitude "+Longitude);
-        uPos = new LatLng(Latitude, Longitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));*/
+
 
         markerMap(mMap,RouteQuery);
     }
@@ -224,7 +215,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
     private void markerMap(final GoogleMap gMap, final String queryRoute){
 
         // CONSULTA A LA BASE DE DATOS DE LA UBICACION DE LAS UNIDADES
-        mDatabase.child("Users").addListenerForSingleValueEvent(new ValueEventListener() {
+        mData.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for(Marker marker: Markers){
@@ -234,13 +225,12 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                     mDatabase.child("Users").child(snapshot.getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot2) {
-                            //Log.e("asdasd",""+dataSnapshot2.child("tipo").getValue(Integer.class));
                             if(2 == dataSnapshot2.child("tipo").getValue(Integer.class) && dataSnapshot2.child("Companya").getValue(String.class).equals(queryRoute)){
                                 try {
                                     BusPosition bp = dataSnapshot2.child("Ubicacion").getValue(BusPosition.class);
                                     Double lat = bp.getLatitud();
                                     Double lon = bp.getLongitud();
-                                    //Log.e("LATLONG",""+lat+","+lon);
+
                                     MarkerOptions markeroptions = new MarkerOptions();
                                     markeroptions.position(new LatLng(lat,lon)).title(
                                             ""+dataSnapshot2.child("email").getValue()).snippet(
@@ -249,7 +239,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                                     tmpMarker.add(gMap.addMarker(markeroptions));
                                 }
                                 catch (NullPointerException e){
-                                    Log.e("Exception", ""+e.toString());
+                                    Log.e("Exceptionnullpoint", ""+e.toString());
                                 }
 
 
@@ -260,6 +250,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError databaseError) {
+                            Log.e("MensajeonCan1", databaseError.toString());
 
                         }
                     });
@@ -268,6 +259,8 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("MensajeonCan", databaseError.toString());
+
 
             }
         });
@@ -286,7 +279,6 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onFinish() {
                 markerMap(mMap, RouteQuery);
-                //Toast.makeText(rutaInterfaz.this, "Actualizando", Toast.LENGTH_SHORT).show();
             }
         }.start();
 
@@ -300,10 +292,10 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
                 ArrayList<BusPosition> Ruta = new ArrayList<>();
 
                 Ruta.addAll(StringToArray(dataSnapshot.getValue(String.class)));
-                Latitude = Ruta.get((int)Ruta.size()/2).getLatitud();
-                Longitude = Ruta.get((int)Ruta.size()/2).getLongitud();
-                Log.e("msg1", "latitude "+Latitude+" Longitude "+Longitude);
-                uPos = new LatLng(Latitude, Longitude);
+                Lati = Ruta.get((int)Ruta.size()/2).getLatitud();
+                Long = Ruta.get((int)Ruta.size()/2).getLongitud();
+
+                uPos = new LatLng(Lati, Long);
                 gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(uPos,15));
 
                 PolylineOptions polylineOptions = new PolylineOptions();
@@ -341,6 +333,7 @@ public class rutaInterfaz extends FragmentActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.e("Mensaje", databaseError.toString());
 
             }
         });

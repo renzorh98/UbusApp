@@ -23,8 +23,8 @@ android {
 }
 sonarqube {
     properties {
-        property "sonar.projectName", "Ubus"
-        property "sonar.projectKey", "Ubus"
+        property "sonar.projectName", "AppUbusTest"
+        property "sonar.projectKey", "AppUbusTest"
         property "sonar.host.url", "http://localhost:9000"
         property "sonar.language", "java"
         property "sonar.sources", "src/main/java"

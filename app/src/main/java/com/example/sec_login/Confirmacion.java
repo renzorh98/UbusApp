@@ -1,8 +1,5 @@
 package com.example.sec_login;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -11,6 +8,9 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,7 +31,12 @@ import java.util.Map;
 
 public class Confirmacion extends AppCompatActivity {
 
-    private TextView tvID, tvStatus, tvMonto, tvComp, tvTrans, tvPag;
+    private TextView tvID;
+    private TextView tvStatus;
+    private TextView tvMonto;
+    private TextView tvComp;
+    private TextView tvTrans;
+    private TextView tvPag;
     private ImageView qrCode;
     private DatabaseReference mDatabase;
 
@@ -53,7 +58,7 @@ public class Confirmacion extends AppCompatActivity {
             JSONObject jsonObject = new JSONObject(intent.getStringExtra("PaymentDetails"));
             verDetalles(jsonObject.getJSONObject("response"), intent.getStringExtra("PaymentAmount"), intent.getStringExtra("DetallesTrans"), intent.getStringExtra("User"));
         }catch (JSONException e){
-            e.printStackTrace();
+            Log.e("Mensaje", ""+e.toString());
         }
 
     }
@@ -84,7 +89,8 @@ public class Confirmacion extends AppCompatActivity {
             qrCode.setImageBitmap(bitmap);
 
         } catch (WriterException e) {
-            e.printStackTrace();
+            Log.e("Mensaje", ""+e.toString());
+
         }
         Map<String, Object> map = new HashMap<>();
         map.put("Status", tvStatus.getText());

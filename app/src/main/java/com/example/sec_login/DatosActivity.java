@@ -1,38 +1,28 @@
 package com.example.sec_login;
 
+import android.app.Activity;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.media.Image;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import com.example.sec_login.Config.Config;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,23 +30,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.Result;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
-
-import com.example.sec_login.Config.Config;
 import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalPayment;
 import com.paypal.android.sdk.payments.PayPalService;
@@ -66,6 +46,11 @@ import com.paypal.android.sdk.payments.PaymentConfirmation;
 import org.json.JSONException;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 public class DatosActivity extends AppCompatActivity{
     /*PARTES VISTA*/
@@ -84,12 +69,9 @@ public class DatosActivity extends AppCompatActivity{
     /*CONNEXION FIREBASE*/
     FirebaseAuth mAuth;
     DatabaseReference mDatabase;
-    private FirebaseAuth.AuthStateListener mAuthState;
-    private CallbackManager mCallbackManager;
-    private AccessTokenTracker accessTokenTracker;
+
     /*FIN CONNEXION FIREBASE*/
     /*QR Scanner*/
-    private ZXingScannerView mScannerView;
     private Button BgenerateQR;
     private Button BscanQR;
 
@@ -125,7 +107,6 @@ public class DatosActivity extends AppCompatActivity{
                 Intent intent = new Intent(DatosActivity.this, OperacionesActivity.class);
                 intent.putExtra("tipoUsuario", tipoUsuario);
                 startActivity(intent);
-                //startActivity(new Intent(DatosActivity.this,OperacionesActivity.class));
             }
         });
 
@@ -145,7 +126,6 @@ public class DatosActivity extends AppCompatActivity{
 
             @Override
             public void onClick(View v) {
-                //Log.e("dim", ""+qrCode.getLayoutParams().height);
                 if(qrCode.getLayoutParams().height != 0){
                     qrCode.setImageBitmap(null);
                     qrCode.getLayoutParams().height= 0;
@@ -163,7 +143,8 @@ public class DatosActivity extends AppCompatActivity{
                         qrCode.setImageBitmap(bitmap);
 
                     } catch (WriterException e) {
-                        e.printStackTrace();
+                        Log.e("Mensajegenqr", e.toString());
+
                     }
                 }
 
@@ -199,22 +180,7 @@ public class DatosActivity extends AppCompatActivity{
             }
         });
 
-        mAuthState= new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user=firebaseAuth.getCurrentUser();
-            }
-        };
-        accessTokenTracker=new AccessTokenTracker() {
-            @Override
-            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken, AccessToken currentAccessToken) {
-                if(currentAccessToken==null){
-                    mAuth.signOut();
-                    startActivity(new Intent(DatosActivity.this,MainActivity.class));
-                    finish();
-                }
-            }
-        };
+
         getDatos();
         Intent intent = new Intent(this,PayPalService.class);
         intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
@@ -240,11 +206,16 @@ public class DatosActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
         if(requestCode == PAYPAL_REQUEST_CODE){
             if(resultCode == RESULT_OK){
-                PaymentConfirmation confirmation = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
-
+                PaymentConfirmation confirmation = null;
+                try {
+                    confirmation = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+                }
+                catch (NullPointerException e){
+                    Log.e("Mensajenullexe", ""+e.toString());
+                }
                 if (confirmation != null){
                     try {
                         String paymentDetails = confirmation.toJSONObject().toString(4);
@@ -252,7 +223,8 @@ public class DatosActivity extends AppCompatActivity{
                         startActivity(new Intent(this,Confirmacion.class).putExtra("PaymentDetails",paymentDetails).putExtra("PaymentAmount", monto).putExtra("DetallesTrans",textcode).putExtra("User", TVUsuario.getText()));
 
                     }catch (JSONException e){
-                        e.printStackTrace();
+                        Log.e("Mensajejsonexec", e.toString());
+
                     }
                 }
             }
@@ -274,7 +246,6 @@ public class DatosActivity extends AppCompatActivity{
                 builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //Realizar pago
                         scanCode();
 
                     }
@@ -328,7 +299,7 @@ public class DatosActivity extends AppCompatActivity{
                             }
                         }
                         catch(Exception e){
-
+                            Log.e("Mensaje", e.toString());
                         }
 
                         if (tipo == 1) {

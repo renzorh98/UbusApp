@@ -173,7 +173,7 @@ public class RegistroActivity extends AppCompatActivity {
                 Codigo= ETCodigoRegistroL.getText().toString().trim();
                 if ((   (!ES_Proveedor && !Usuario.isEmpty()) ||
                         (ES_Proveedor && ES_Compania && !Compania.isEmpty() && !NumContacto.isEmpty() ) ||
-                        (ES_Proveedor && !ES_Compania && !Placa.isEmpty() && SPCompanias.getSelectedItem().toString()!="Seleccione" )
+                        (ES_Proveedor && !ES_Compania && !Placa.isEmpty() && !(SPCompanias.getSelectedItem().toString().equals("Seleccione")) )
                     )
                     && !Email.isEmpty() && !Password.isEmpty()) {
                     if (Password.length() >= 6) {
