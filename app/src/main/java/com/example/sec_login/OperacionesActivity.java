@@ -130,6 +130,7 @@ public class OperacionesActivity extends AppCompatActivity {
             public void onSuccess(Location location) {
                 if(location != null){
                     Log.e("",location.getLatitude()+","+location.getLongitude());
+                    mDatabase.child("Users").child(id).child("Ubicacion").child("IdaVuelta").setValue(0);
                     mDatabase.child("Users").child(id).child("Ubicacion").child("Latitud").setValue(location.getLatitude());
                     mDatabase.child("Users").child(id).child("Ubicacion").child("Longitud").setValue(location.getLongitude());
 
