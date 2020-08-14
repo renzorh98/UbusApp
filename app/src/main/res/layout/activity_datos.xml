@@ -6,33 +6,69 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".DatosActivity">
-    <TextView
-        android:id="@+id/Usuario"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SE MOSTRARAN DATOS"
-        android:textSize="18dp"/>
 
-    <TextView
-        android:id="@+id/paypallink"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="344dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        >
 
-        android:onClick="link_PayPal"
-        android:text="Enlazar Paypal referral link"
-        tools:ignore="OnClick"
-        android:textColor="@color/com_facebook_blue"
-        android:textColorLink="@color/colorPrimary"
-        />
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:text="Usuario: "
+            android:textColor="@android:color/white"
+            android:textSize="18dp"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            />
+
+        <TextView
+            android:id="@+id/Usuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SE MOSTRARAN DATOS"
+            android:textSize="18dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="344dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        >
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            android:text="Tipo: "
+            android:textColor="@android:color/white"
+            android:textSize="18dp"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            />
+
+        <TextView
+            android:id="@+id/TextViewTipo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SE MOSTRARAN DATOS"
+            android:textSize="18dp" />
+    </LinearLayout>
     <Button
         android:id="@+id/scan_QR"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:background="@color/colorPrimary"
-        android:text="Escanear QR"
         android:textColor="@android:color/white"
+        android:text="Escanear QR"
+
         />
 
     <Button
@@ -49,10 +85,9 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="0px"
-        android:gravity="center"
+        android:layout_gravity="center"
         app:srcCompat="@mipmap/ic_launcher"
-        tools:layout_editor_absoluteX="152dp"
-        tools:layout_editor_absoluteY="218dp" />
+        />
 
     <Button
         android:id="@+id/GenCodTransportistas"
@@ -68,6 +103,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="" />
+    <Button
+        android:id="@+id/AbrirOperaciones"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:background="@color/colorPrimary"
+        android:text="Operaciones"
+        android:textColor="@android:color/white" />
 
     <Button
         android:id="@+id/CerrarSesion"
@@ -78,21 +121,5 @@
         android:text="Cerrar Sesion"
         android:textColor="@android:color/white" />
 
-    <Button
-        android:id="@+id/AbrirOperaciones"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="20dp"
-        android:background="@color/colorPrimary"
-        android:text="Operaciones"
-        android:textColor="@android:color/white" />
-
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
 
 </LinearLayout>

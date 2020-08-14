@@ -6,30 +6,48 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".OperacionesActivity">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        >
+        <Button
+            android:id="@+id/ActivarGPS"
+            android:layout_width="197dp"
+            android:layout_height="49dp"
+            android:background="#D82C2C"
+            android:text="GPS Off"
+            tools:layout_editor_absoluteX="36dp"
+            tools:layout_editor_absoluteY="33dp"
+            android:layout_marginTop="10dp"
 
-    <Button
-        android:id="@+id/ActivarGPS"
-        android:layout_width="197dp"
-        android:layout_height="49dp"
-        android:background="#D82C2C"
-        android:text="GPS Off"
-        tools:layout_editor_absoluteX="36dp"
-        tools:layout_editor_absoluteY="33dp" />
+            />
 
-    <Button
-        android:id="@+id/SeleccionRuta"
-        android:layout_width="199dp"
-        android:layout_height="63dp"
-        android:text="Selección de Ruta"
-        tools:layout_editor_absoluteX="36dp"
-        tools:layout_editor_absoluteY="112dp"
-        tools:ignore="MissingConstraints" />
+        <Button
+            android:id="@+id/SeleccionRuta"
+            android:layout_width="199dp"
+            android:layout_height="63dp"
+            android:text="Selección de Ruta"
+            tools:layout_editor_absoluteX="36dp"
+            tools:layout_editor_absoluteY="112dp"
+            tools:ignore="MissingConstraints"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
+            />
 
-    <Button
-        android:id="@+id/VerRuta"
-        android:layout_width="199dp"
-        android:layout_height="58dp"
-        android:text="Ver Ruta"
-        tools:layout_editor_absoluteX="34dp"
-        tools:layout_editor_absoluteY="265dp" />
+        <Button
+            android:id="@+id/VerRuta"
+            android:layout_width="199dp"
+            android:layout_height="58dp"
+            android:text="Ver Ruta"
+            tools:layout_editor_absoluteX="34dp"
+            tools:layout_editor_absoluteY="265dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary"
+            android:textColor="@android:color/white"
+            />
+    </LinearLayout>
 </LinearLayout>

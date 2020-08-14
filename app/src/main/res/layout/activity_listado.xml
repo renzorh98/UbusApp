@@ -19,9 +19,13 @@
 
             <TextView
                 android:id="@+id/Seleccion"
-                android:layout_width="259dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Seleccione hasta 3 compañias y la Ruta" />
+                android:background="@color/colorPrimary"
+                android:text="Seleccione hasta 3 compañias y la Ruta"
+                android:textColor="@android:color/white"
+                android:textSize="20dp"
+                android:layout_marginTop="20dp"/>
 
             <TableLayout
                 android:id="@+id/ListadoCompanyas"
@@ -32,9 +36,13 @@
 
             <Button
                 android:id="@+id/BuscarCercanos"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Buscar Cercanos" />
+                android:text="Buscar Cercanos"
+                android:layout_gravity="center"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                />
         </LinearLayout>
     </ScrollView>
 

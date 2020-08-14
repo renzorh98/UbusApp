@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -27,7 +28,6 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -56,14 +56,25 @@ import java.util.UUID;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class DatosActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler{
+import com.example.sec_login.Config.Config;
+import com.paypal.android.sdk.payments.PayPalConfiguration;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
+
+import org.json.JSONException;
+
+import java.math.BigDecimal;
+
+public class DatosActivity extends AppCompatActivity{
     /*PARTES VISTA*/
     private Button BCerrarSesion;
     private Button BGenerarCodigo;
     private Button BAbrirOperaciones;
     private TextView TVUsuario;
     private TextView TVCodigo;
-    private LoginButton BLoginFacebook;
+    private TextView TVTipo;
     private ImageView qrCode;
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
@@ -82,9 +93,22 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
     private Button BgenerateQR;
     private Button BscanQR;
 
+    private String textcode;
     private String bdemail;
     private String bdtipo;
+    private String bdcompanya;
+    private String bdruta;
+    private String monto = "0.30";
     /*Fin QR Scanner*/
+    private static final int PAYPAL_REQUEST_CODE = 7171;
+    private static PayPalConfiguration config = new PayPalConfiguration()
+            .environment(PayPalConfiguration.ENVIRONMENT_SANDBOX)
+            .clientId(Config.PAYPAL_CLIENT_ID);
+    @Override
+    protected void onDestroy() {
+        stopService(new Intent(this,PayPalService.class));
+        super.onDestroy();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +117,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference();
         TVUsuario=(TextView)findViewById(R.id.Usuario);
+        TVTipo=(TextView)findViewById(R.id.TextViewTipo);
         BAbrirOperaciones=findViewById(R.id.AbrirOperaciones);
         BAbrirOperaciones.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,9 +128,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                 //startActivity(new Intent(DatosActivity.this,OperacionesActivity.class));
             }
         });
-        BLoginFacebook=findViewById(R.id.login_button);
-        BLoginFacebook.setReadPermissions("email","public_profile");
-        BLoginFacebook.setVisibility(View.INVISIBLE);
+
         BCerrarSesion=(Button)findViewById(R.id.CerrarSesion);
         BCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,20 +145,28 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
 
             @Override
             public void onClick(View v) {
-                MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-                String textcode = "user: "+(String)TVUsuario.getText()+"\nemail: "+bdemail+"\ntipo: "+bdtipo;
-
-
-                try {
-                    BitMatrix bitMatrix = multiFormatWriter.encode(""+textcode, BarcodeFormat.QR_CODE, 500, 500);
-                    BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                    Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-                    qrCode.getLayoutParams().height= 500;
-                    qrCode.setImageBitmap(bitmap);
-
-                } catch (WriterException e) {
-                    e.printStackTrace();
+                //Log.e("dim", ""+qrCode.getLayoutParams().height);
+                if(qrCode.getLayoutParams().height != 0){
+                    qrCode.setImageBitmap(null);
+                    qrCode.getLayoutParams().height= 0;
                 }
+                else {
+                    MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+                    textcode = "Compania: "+bdcompanya+"\nUser: "+(String)TVUsuario.getText()+"\nTipo: "+bdtipo+"\nEmail: "+bdemail+"\nRuta: "+bdruta;
+
+
+                    try {
+                        BitMatrix bitMatrix = multiFormatWriter.encode(""+textcode, BarcodeFormat.QR_CODE, 500, 500);
+                        BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                        Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+                        qrCode.getLayoutParams().height= 500;
+                        qrCode.setImageBitmap(bitmap);
+
+                    } catch (WriterException e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
         });
         TVCodigo=findViewById(R.id.MostrarCodigo);
@@ -165,11 +196,6 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
             @Override
             public void onClick(View v) {
                 scanCode();
-//                Intent intent = new Intent();
-//                mScannerView = new ZXingScannerView(DatosActivity.this);
-//                setContentView(mScannerView);
-//                mScannerView.setResultHandler(DatosActivity.this);
-//                mScannerView.startCamera();
             }
         });
 
@@ -190,6 +216,9 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
             }
         };
         getDatos();
+        Intent intent = new Intent(this,PayPalService.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+        startService(intent);
     }
 
     private void scanCode() {
@@ -200,13 +229,46 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
         integrator.setPrompt("Scanning Code");
         integrator.initiateScan();
     }
+    private void procesarPago(){
+        PayPalPayment payPalPayment = new PayPalPayment(new BigDecimal(String.valueOf(monto)),
+                "USD", "Pago viaje", PayPalPayment.PAYMENT_INTENT_SALE);
+
+        Intent intent = new Intent(this, PaymentActivity.class);
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION,config);
+        intent.putExtra(PaymentActivity.EXTRA_PAYMENT,payPalPayment);
+        startActivityForResult(intent,PAYPAL_REQUEST_CODE);
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if(requestCode == PAYPAL_REQUEST_CODE){
+            if(resultCode == RESULT_OK){
+                PaymentConfirmation confirmation = data.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+
+                if (confirmation != null){
+                    try {
+                        String paymentDetails = confirmation.toJSONObject().toString(4);
+                        Log.d("Activity",""+paymentDetails);
+                        startActivity(new Intent(this,Confirmacion.class).putExtra("PaymentDetails",paymentDetails).putExtra("PaymentAmount", monto).putExtra("DetallesTrans",textcode).putExtra("User", TVUsuario.getText()));
+
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            else if(resultCode == Activity.RESULT_CANCELED){
+                Toast.makeText(this, "Cancelada",Toast.LENGTH_SHORT).show();
+
+            }
+        } else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+            Toast.makeText(this, "Invalida", Toast.LENGTH_SHORT).show();
+        }
+
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
         if(result != null){
             if(result.getContents() != null){
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                textcode = result.getContents();
                 builder.setMessage(result.getContents());
                 builder.setTitle("Scanning Result");
                 builder.setPositiveButton("Scan Again", new DialogInterface.OnClickListener() {
@@ -219,14 +281,17 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                 }).setNegativeButton("Close", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                }).setNegativeButton("Pay", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.e("Pago", "Realizar pago Paypal");
+                        dialog.cancel();
                     }
                 });
+                if (tipoUsuario == 3){
+                    builder.setNeutralButton("Pay", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            procesarPago();
+                        }
+                    });
+                }
                 AlertDialog dialog = builder.create();
                 dialog.show();
             }else{
@@ -253,6 +318,18 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                         TVUsuario.setText(Usuario);
                         bdemail=dataSnapshot.child("email").getValue().toString();
                         bdtipo=dataSnapshot.child("tipo").getValue().toString();
+                        try {
+                            bdcompanya = dataSnapshot.child("Companya").getValue().toString();
+
+                            if(dataSnapshot.child("Ubicacion").child("IdaVuelta").getValue(Integer.class) == 0){
+                                bdruta = "Ida";
+                            }else{
+                                bdruta = "Vuelta";
+                            }
+                        }
+                        catch(Exception e){
+
+                        }
 
                         if (tipo == 1) {
                             bdtipo="Compania";
@@ -262,12 +339,12 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                         } else if (tipo == 2) {
                             bdtipo="Transportista";
                             BscanQR.setVisibility(View.VISIBLE);
-                            BgenerateQR.setVisibility(View.INVISIBLE);
+                            BgenerateQR.setVisibility(View.VISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         } else {
                             bdtipo="Ciudadano";
-                            BscanQR.setVisibility(View.INVISIBLE);
-                            BgenerateQR.setVisibility(View.VISIBLE);
+                            BscanQR.setVisibility(View.VISIBLE);
+                            BgenerateQR.setVisibility(View.INVISIBLE);
                             BGenerarCodigo.setVisibility(View.INVISIBLE);
                         }
 
@@ -283,6 +360,7 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
                     BgenerateQR.setVisibility(View.VISIBLE);
                     BGenerarCodigo.setVisibility(View.INVISIBLE);
                 }
+                TVTipo.setText(bdtipo);
             }
 
             @Override
@@ -290,23 +368,5 @@ public class DatosActivity extends AppCompatActivity implements ZXingScannerView
 
             }
         });
-    }
-
-    @Override
-    public void handleResult(Result result) {
-        Log.v("HandleResult", result.getText());
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Resultado del scan");
-        builder.setMessage(result.getText());
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-
-        //mScannerView.resumeCameraPreview(this);
-
-
-    }
-    public void link_PayPal(View v){
-        Toast.makeText(this, "Por implementar! ", Toast.LENGTH_LONG).show();
     }
 }

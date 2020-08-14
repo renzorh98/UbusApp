@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: "org.sonarqube"
 android {
     compileSdkVersion 29
 
@@ -20,6 +21,19 @@ android {
         }
     }
 }
+sonarqube {
+    properties {
+        property "sonar.projectName", "Ubus"
+        property "sonar.projectKey", "Ubus"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.language", "java"
+        property "sonar.sources", "src/main/java"
+        property "sonar.java.sources", "src/main/java"
+        property "sonar.sourceEncoding", "UTF-8"
+        property "sonar.login", "admin"
+        property "sonar.password", "admin"
+    }
+}
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
@@ -37,4 +51,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.paypal.sdk:paypal-android-sdk:2.15.3'
+
 }
