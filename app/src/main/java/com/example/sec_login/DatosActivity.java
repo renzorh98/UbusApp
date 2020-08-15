@@ -115,7 +115,7 @@ public class DatosActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 mAuth.signOut();
-                com.facebook.login.LoginManager.getInstance().logOut();
+                //com.facebook.login.LoginManager.getInstance().logOut();
                 startActivity(new Intent(DatosActivity.this,MainActivity.class));
                 finish();
 

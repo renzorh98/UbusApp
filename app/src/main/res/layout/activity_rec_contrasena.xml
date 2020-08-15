@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    tools:context=".RecContrasena">
+
+
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="143dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        app:srcCompat="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ingrese el email de la cuenta a consultar, tras presionar el boton recuperar revise su correo."
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="10dp"
+        android:gravity="center"
+        android:textSize="20dp"
+        android:textColor="@android:color/white"
+        android:background="@color/colorPrimary"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Email:"
+            android:textSize="20dp"
+            android:textColor="@android:color/black"
+            />
+        <EditText
+            android:id="@+id/EmailRC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ingrese el email de la cuenta"
+            android:layout_marginLeft="10dp"/>
+    </LinearLayout>
+    <Button
+        android:id="@+id/EnviarEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recuperar contraseña"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/white"/>
+    <Button
+        android:id="@+id/Volver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salir"
+        android:background="@color/colorAccent"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/white"/>
+
+</LinearLayout>

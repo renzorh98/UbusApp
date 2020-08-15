@@ -20,7 +20,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Confirmacion"></activity>
+        <activity android:name=".RecContrasena"></activity>
+        <activity android:name=".Confirmacion" />
         <activity android:name=".BusesCercanos" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

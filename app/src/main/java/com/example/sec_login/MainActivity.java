@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText ETPasswordL;
     private Button BLogin;
     private Button BRegistrar;
+    private Button BRecCon;
     private LoginButton BLoginFacebook;
     /*FIN PARTES VISTA*/
     /*VARIABLES*/
@@ -73,8 +74,16 @@ public class MainActivity extends AppCompatActivity {
         ETUsuarioL=(EditText)findViewById(R.id.UsuarioL);
         ETPasswordL=(EditText)findViewById(R.id.PasswordL);
         BLogin=(Button)findViewById(R.id.Login);
-        BLoginFacebook=findViewById(R.id.login_button);
-        BLoginFacebook.setReadPermissions("email","public_profile");
+        BRecCon=(Button)findViewById(R.id.Recuperar);
+        BRecCon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, RecContrasena.class);
+                startActivity(i);
+                finish();
+            }
+        });
+
         BRegistrar=(Button)findViewById(R.id.Registrar);
         BLogin.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -94,22 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this,RegistroActivity.class));
             }
         });
-        BLoginFacebook.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                handleFacebookToken(loginResult.getAccessToken());
-            }
 
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-
-            }
-        });
         mAuthState= new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
